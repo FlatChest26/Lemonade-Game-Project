@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12224.181 stable
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LemonadeGame", "LemonadeGame\LemonadeGame.vcxproj", "{25D7C3F2-458E-4E52-B732-B699E3A816E2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LemonadeEngine", "LemonadeEngine\LemonadeEngine.vcxproj", "{A0EE6213-1802-4729-9504-2AB9DE0DC60E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25D7C3F2-458E-4E52-B732-B699E3A816E2}.Debug|x64.ActiveCfg = Debug|x64
+		{25D7C3F2-458E-4E52-B732-B699E3A816E2}.Debug|x64.Build.0 = Debug|x64
+		{25D7C3F2-458E-4E52-B732-B699E3A816E2}.Debug|x86.ActiveCfg = Debug|Win32
+		{25D7C3F2-458E-4E52-B732-B699E3A816E2}.Debug|x86.Build.0 = Debug|Win32
+		{25D7C3F2-458E-4E52-B732-B699E3A816E2}.Release|x64.ActiveCfg = Release|x64
+		{25D7C3F2-458E-4E52-B732-B699E3A816E2}.Release|x64.Build.0 = Release|x64
+		{25D7C3F2-458E-4E52-B732-B699E3A816E2}.Release|x86.ActiveCfg = Release|Win32
+		{25D7C3F2-458E-4E52-B732-B699E3A816E2}.Release|x86.Build.0 = Release|Win32
+		{A0EE6213-1802-4729-9504-2AB9DE0DC60E}.Debug|x64.ActiveCfg = Debug|x64
+		{A0EE6213-1802-4729-9504-2AB9DE0DC60E}.Debug|x64.Build.0 = Debug|x64
+		{A0EE6213-1802-4729-9504-2AB9DE0DC60E}.Debug|x86.ActiveCfg = Debug|Win32
+		{A0EE6213-1802-4729-9504-2AB9DE0DC60E}.Debug|x86.Build.0 = Debug|Win32
+		{A0EE6213-1802-4729-9504-2AB9DE0DC60E}.Release|x64.ActiveCfg = Release|x64
+		{A0EE6213-1802-4729-9504-2AB9DE0DC60E}.Release|x64.Build.0 = Release|x64
+		{A0EE6213-1802-4729-9504-2AB9DE0DC60E}.Release|x86.ActiveCfg = Release|Win32
+		{A0EE6213-1802-4729-9504-2AB9DE0DC60E}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {17F25D96-62D6-4FFB-9452-E730F0A29C7B}
+	EndGlobalSection
+EndGlobal

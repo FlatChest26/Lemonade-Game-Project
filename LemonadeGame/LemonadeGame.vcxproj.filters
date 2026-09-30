@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{964f3287-55af-464d-b618-df04d9f4d3ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Data">
+      <UniqueIdentifier>{f6074b59-93f4-4419-b061-9f750a4ddd78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Things">
+      <UniqueIdentifier>{553d1e5c-0296-4537-bde3-aa16d5ebcd7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Things">
+      <UniqueIdentifier>{b52a7e55-435d-41b3-af2f-e4ec1ba6a450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raw Files">
+      <UniqueIdentifier>{60fc8671-427b-4f6b-9903-9173e98f5dd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raw Files\core">
+      <UniqueIdentifier>{639c3cea-da02-43ae-918e-7bcad71b8412}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Raw Files\mods">
+      <UniqueIdentifier>{595b515e-8e45-45f2-9493-35167bcc1d39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entity">
+      <UniqueIdentifier>{4f6a588c-1770-4a2b-b5b8-6a79b4e975aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game States">
+      <UniqueIdentifier>{1aab7164-1170-48ea-bd08-b6e55ac1058e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game States">
+      <UniqueIdentifier>{35f7d9eb-3f3d-4dc2-a658-7d501cfe0177}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity">
+      <UniqueIdentifier>{c5a28222-693c-4268-9a5e-ed733aee0c33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tile Map">
+      <UniqueIdentifier>{cf2dcd8b-3e96-4965-bb2a-42974de08653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tile Map">
+      <UniqueIdentifier>{96694cbb-776e-43d6-80b6-f9223ab11e1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Actions">
+      <UniqueIdentifier>{70752da2-06dc-4e56-8772-64eca959502c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Actions">
+      <UniqueIdentifier>{b35583c0-9f62-49e6-a965-1889d907dec9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{9510a4ee-5acf-4c07-96cb-3e09dd14690d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{bc1c5403-761e-414c-8dde-ea27189e393f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\lemonade_game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world_state.h">
+      <Filter>Header Files\Game States</Filter>
+    </ClInclude>
+    <ClInclude Include="src\render_params.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\time_units.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\snowy_grammar.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\creature_data.h">
+      <Filter>Header Files\Things</Filter>
+    </ClInclude>
+    <ClInclude Include="src\species.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tile_data.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game_loop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inventory.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\entity.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tile_map.h">
+      <Filter>Header Files\Tile Map</Filter>
+    </ClInclude>
+    <ClInclude Include="src\thing.h">
+      <Filter>Header Files\Things</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tile.h">
+      <Filter>Header Files\Tile Map</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game_states.h">
+      <Filter>Header Files\Game States</Filter>
+    </ClInclude>
+    <ClInclude Include="src\action.h">
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input_handler.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\player_input_handler.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\creature.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\map_builder.h">
+      <Filter>Header Files\Tile Map</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fov.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\direction_action.h">
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\location_actions.h">
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\misc_actions.h">
+      <Filter>Header Files\Actions</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world_state.cpp">
+      <Filter>Source Files\Game States</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game_loop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\entity.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\inventory.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tile_map.cpp">
+      <Filter>Source Files\Tile Map</Filter>
+    </ClCompile>
+    <ClCompile Include="src\action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\player_input_handler.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\creature_data.cpp">
+      <Filter>Source Files\Things</Filter>
+    </ClCompile>
+    <ClCompile Include="src\creature.cpp">
+      <Filter>Source Files\Things</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fov.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\direction_action.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\location_actions.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\misc_actions.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\config\settings.cfg">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="raws\core\species.cfg">
+      <Filter>Raw Files\core</Filter>
+    </None>
+  </ItemGroup>
+</Project>
