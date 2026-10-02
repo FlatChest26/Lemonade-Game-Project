@@ -6,25 +6,30 @@
 #include <string>
 #include <vector>
 
+#include "snowy_macros.h"
+
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #include "enum_traits.h"
 
 template<typename T, typename Predicate>
-inline std::string english_list( T list, Predicate to_str )
+inline std::string english_list(T list, Predicate to_str)
 {
 	std::string final_list = "";
 
 	size_t i = 0;
 
-	for ( const auto& item : list )
+	for (const auto& item : list)
 	{
-		final_list += to_str( item );
+		final_list += to_str(item);
 
-		if ( i == list.size() - 1 )
+		if (i == list.size() - 1)
 		{
 		}
-		else if ( list.size() > 2 )
+		else if (list.size() > 2)
 		{
-			if ( i == list.size() - 2 )
+			if (i == list.size() - 2)
 			{
 				final_list += ", and ";
 			}
@@ -33,7 +38,7 @@ inline std::string english_list( T list, Predicate to_str )
 				final_list += ", ";
 			}
 		}
-		else if ( i == list.size() - 2 )
+		else if (i == list.size() - 2)
 		{
 			final_list += " and ";
 		}
@@ -44,47 +49,93 @@ inline std::string english_list( T list, Predicate to_str )
 	return final_list;
 }
 
-inline constexpr std::string capitalize( std::string str )
+inline constexpr std::string capitalize(std::string str)
 {
-	if ( str.empty() )
+	if (str.empty())
 	{
 		return str;
 	}
 
-	str[0] = toupper( str[0] );
+	str[0] = toupper(str[0]);
 
 	return str;
 }
 
-constexpr std::string a( std::string noun ) { return "a " + noun; }
-constexpr std::string A( std::string noun ) { return capitalize( a( noun ) ); }
+constexpr std::string a(std::string noun) { return "a " + noun; }
+constexpr std::string A(std::string noun) { return capitalize(a(noun)); }
 
-constexpr std::string an( std::string noun ) { return a( noun ); }
-constexpr std::string An( std::string noun ) { return A( noun ); }
+constexpr std::string an(std::string noun) { return a(noun); }
+constexpr std::string An(std::string noun) { return A(noun); }
 
 struct Noun
 {
 	const char* singular = "";
 	const char* plural = "";
-	bool is_plural = false;
+	bool always_plural = false;
 
-	constexpr operator const char* ( ) const { return singular; }
+	constexpr operator const char* () const { return singular; }
 	constexpr operator std::string() const { return singular; }
 
 	constexpr bool empty() const { return singular[0] == '\0' && plural[0] == '\0'; }
+
+	static Noun from_json(const json& j)
+	{
+		Noun n;
+
+		if (j.contains("singular"))
+		{
+			if (!j.at("singular").is_string())
+			{
+				CERR("Invalid 'singular' field in noun JSON object: " << j);
+				n.singular = "<invalid noun>";
+			}
+			else
+			{
+				n.singular = (j.at("singular").get<std::string>()).c_str();
+			}
+		}
+
+		if (j.contains("plural"))
+		{
+			if (!j.at("plural").is_string())
+			{
+				CERR("Invalid 'plural' field in noun JSON object: " << j);
+				n.plural = "<invalid noun>";
+			}
+			else
+			{
+				n.plural = (j.at("plural").get<std::string>()).c_str();
+			}
+		}
+
+		if (j.contains("always_plural"))
+		{
+			if (!j.at("always_plural").is_boolean())
+			{
+				CERR("Invalid 'always_plural' field in noun JSON object: " << j);
+				n.always_plural = false;
+			}
+			else
+			{
+				n.always_plural = j.at("always_plural").get<bool>();
+			}
+		}
+
+		return n;
+	}
 };
 
 namespace std
 {
-	inline constexpr string to_string( Noun noun ) { return noun.singular; }
+	inline constexpr string to_string(Noun noun) { return noun.singular; }
 }
 
 struct Name
 {
 	const char* nickname = "";
-	const char* full_name { nickname };
+	const char* full_name{ nickname };
 
-	constexpr operator const char* ( ) const { return nickname; }
+	constexpr operator const char* () const { return nickname; }
 	constexpr operator std::string() const { return nickname; }
 
 	constexpr bool empty() const { return nickname[0] == '\0' && full_name[0] == '\0'; }
@@ -92,7 +143,7 @@ struct Name
 
 namespace std
 {
-	inline constexpr string to_string( Name name ) { return name.full_name; }
+	inline constexpr string to_string(Name name) { return name.full_name; }
 }
 
 struct Age
@@ -100,9 +151,9 @@ struct Age
 	using age_t = short;
 
 	age_t physical_age;
-	age_t chronological_age { physical_age };
+	age_t chronological_age{ physical_age };
 
-	constexpr bool operator==( Age other ) const { return physical_age == other.physical_age && chronological_age == other.chronological_age; }
+	constexpr bool operator==(Age other) const { return physical_age == other.physical_age && chronological_age == other.chronological_age; }
 	constexpr operator age_t() const { return physical_age; }
 };
 
@@ -117,7 +168,7 @@ struct Pronouns
 
 	bool acts_plural = false;
 
-	constexpr operator const char* ( ) const { return shortened; }
+	constexpr operator const char* () const { return shortened; }
 	constexpr operator std::string() const { return shortened; }
 };
 
@@ -198,11 +249,11 @@ struct Gender
 	type gender_type;
 };
 
-IS_FLAG_ENUM( Gender::type )
+IS_FLAG_ENUM(Gender::type)
 
 namespace gender
 {
-	inline Gender NEUTER {
+	inline Gender NEUTER{
 		.noun = {},
 		.pronouns = pronouns::IT_ITS,
 		.is_plural = false,
@@ -210,7 +261,7 @@ namespace gender
 		.gender_type = Gender::type::NEUTER
 	};
 
-	inline Gender NON_SPECIFIC {
+	inline Gender NON_SPECIFIC{
 		.noun = {"person", "people"},
 		.pronouns = pronouns::THEY_THEM,
 		.is_plural = false,
@@ -218,7 +269,7 @@ namespace gender
 		.gender_type = Gender::type::EPICENE
 	};
 
-	inline Gender MASCULINE {
+	inline Gender MASCULINE{
 		.noun = {"man", "men"},
 		.pronouns = pronouns::HE_HIM,
 		.is_plural = false,
@@ -226,7 +277,7 @@ namespace gender
 		.gender_type = Gender::type::MASCULINE
 	};
 
-	inline Gender FEMININE {
+	inline Gender FEMININE{
 		.noun = {"woman", "women"},
 		.pronouns = pronouns::SHE_HER,
 		.is_plural = false,
@@ -234,7 +285,7 @@ namespace gender
 		.gender_type = Gender::type::FEMININE
 	};
 
-	inline Gender FEMBOY {
+	inline Gender FEMBOY{
 		.noun = {"femboy", "femboys"},
 		.pronouns = pronouns::HE_HIM,
 		.is_plural = false,
@@ -259,7 +310,7 @@ enum class SexualAttraction : unsigned char
 	ANY = OPPOSITE | SAME | MALE | FEMALE | NEUTER | EPICENE | MASCULINE | FEMININE
 };
 
-IS_FLAG_ENUM( SexualAttraction )
+IS_FLAG_ENUM(SexualAttraction)
 
 struct Sexuality
 {
@@ -330,11 +381,11 @@ enum class SexualPosition : short
 	SUB_BOTTOM = SUB | BOTTOM
 };
 
-IS_FLAG_ENUM( SexualPosition )
+IS_FLAG_ENUM(SexualPosition)
 
 struct GrammarObject
 {
-	virtual constexpr Noun get_noun() const { return Noun { "grammar object", "grammar objects" }; }
+	virtual constexpr Noun get_noun() const { return Noun{ "grammar object", "grammar objects" }; }
 	virtual constexpr Name get_name() const { return Name(); }
 	virtual constexpr Pronouns get_pronouns() const { return pronouns::IT_ITS; }
 
@@ -345,14 +396,14 @@ struct GrammarObject
 
 	constexpr std::string nickname() const
 	{
-		if ( is_named() )
+		if (is_named())
 			return prefix() + get_name().nickname + suffix();
 		return prefix() + singular_noun() + suffix();
 	}
 
 	constexpr std::string full_name() const
 	{
-		if ( is_named() )
+		if (is_named())
 			return prefix() + get_name().full_name + suffix();
 		return prefix() + singular_noun() + suffix();
 	}
@@ -363,36 +414,67 @@ struct GrammarObject
 	constexpr std::string theirs() const { return get_pronouns().independent_possessive; }
 	constexpr std::string themselves() const { return get_pronouns().reflexive; }
 
-	virtual constexpr bool is_plural() const { return get_noun().is_plural; }
+	virtual constexpr bool is_plural() const { return get_noun().always_plural; }
 	virtual constexpr bool is_pronouns_plural() const { return get_pronouns().acts_plural; }
 
 	virtual constexpr std::string prefix() const { return ""; }
 	virtual constexpr std::string suffix() const { return ""; }
-
-
 };
 
 namespace std
 {
-	inline constexpr string to_string( const GrammarObject& T ) { return T.nickname(); }
+	inline constexpr string to_string(const GrammarObject& T) { return T.nickname(); }
+
+	template<typename GramObj>
+	inline constexpr string to_string(const GramObj& T) { return T.nickname(); }
 }
 
-inline constexpr std::string possessive( const GrammarObject& T ) { return T.nickname() + "'s"; }
-inline constexpr std::string Possessive( const GrammarObject& T ) { return capitalize( possessive( T ) ); }
+inline constexpr std::string possessive(const GrammarObject& T) { return T.nickname() + "'s"; }
+inline constexpr std::string Possessive(const GrammarObject& T) { return capitalize(possessive(T)); }
 
-inline constexpr std::string they( const GrammarObject& T ) { return T.get_pronouns().subjective; }
-inline constexpr std::string They( const GrammarObject& T ) { return capitalize( they( T ) ); }
+inline constexpr std::string they(const GrammarObject& T) { return T.get_pronouns().subjective; }
+inline constexpr std::string They(const GrammarObject& T) { return capitalize(they(T)); }
 
-inline constexpr std::string them( const GrammarObject& T ) { return T.get_pronouns().objective; }
-inline constexpr std::string Them( const GrammarObject& T ) { return capitalize( them( T ) ); }
+inline constexpr std::string them(const GrammarObject& T) { return T.get_pronouns().objective; }
+inline constexpr std::string Them(const GrammarObject& T) { return capitalize(them(T)); }
 
-inline constexpr std::string their( const GrammarObject& T ) { return T.get_pronouns().determiner; }
-inline constexpr std::string Their( const GrammarObject& T ) { return capitalize( their( T ) ); }
+inline constexpr std::string their(const GrammarObject& T) { return T.get_pronouns().determiner; }
+inline constexpr std::string Their(const GrammarObject& T) { return capitalize(their(T)); }
 
-inline constexpr std::string theirs( const GrammarObject& T ) { return T.get_pronouns().independent_possessive; }
-inline constexpr std::string Theirs( const GrammarObject& T ) { return capitalize( theirs( T ) ); }
+inline constexpr std::string theirs(const GrammarObject& T) { return T.get_pronouns().independent_possessive; }
+inline constexpr std::string Theirs(const GrammarObject& T) { return capitalize(theirs(T)); }
 
-inline constexpr std::string themselves( const GrammarObject& T ) { return T.get_pronouns().reflexive; }
-inline constexpr std::string Themselves( const GrammarObject& T ) { return capitalize( themselves( T ) ); }
+inline constexpr std::string themselves(const GrammarObject& T) { return T.get_pronouns().reflexive; }
+inline constexpr std::string Themselves(const GrammarObject& T) { return capitalize(themselves(T)); }
+
+template<typename GramObj>
+inline constexpr std::string possessive(const GramObj& T) { return T.nickname() + "'s"; }
+template<typename GramObj>
+inline constexpr std::string Possessive(const GramObj& T) { return capitalize(possessive(T)); }
+
+template<typename GramObj>
+inline constexpr std::string they(const GramObj& T) { return T.get_pronouns().subjective; }
+template<typename GramObj>
+inline constexpr std::string They(const GramObj& T) { return capitalize(they(T)); }
+
+template<typename GramObj>
+inline constexpr std::string them(const GramObj& T) { return T.get_pronouns().objective; }
+template<typename GramObj>
+inline constexpr std::string Them(const GramObj& T) { return capitalize(them(T)); }
+
+template<typename GramObj>
+inline constexpr std::string their(const GramObj& T) { return T.get_pronouns().determiner; }
+template<typename GramObj>
+inline constexpr std::string Their(const GramObj& T) { return capitalize(their(T)); }
+
+template<typename GramObj>
+inline constexpr std::string theirs(const GramObj& T) { return T.get_pronouns().independent_possessive; }
+template<typename GramObj>
+inline constexpr std::string Theirs(const GramObj& T) { return capitalize(theirs(T)); }
+
+template<typename GramObj>
+inline constexpr std::string themselves(const GramObj& T) { return T.get_pronouns().reflexive; }
+template<typename GramObj>
+inline constexpr std::string Themselves(const GramObj& T) { return capitalize(themselves(T)); }
 
 #endif // !LEMONADE_GAME_SRC_SNOWY_GRAMMAR_H

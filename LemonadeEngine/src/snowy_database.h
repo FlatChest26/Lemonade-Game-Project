@@ -8,10 +8,11 @@
 #include <array>
 #include <initializer_list>
 #include "snowy_macros.h"
+#include <string>
 
 namespace snowy
 {
-	using StringID = const char*;
+	using StringID = std::string;
 
 	template<typename K, typename T>
 	class GenericDatabase
@@ -19,10 +20,10 @@ namespace snowy
 		using KeyType = K;
 		using DataType = T;
 
-		using DataIterator = std::vector<T>::iterator;
-		using Const_DataIterator = std::vector<T>::const_iterator;
-		using Reverse_DataIterator = std::vector<T>::reverse_iterator;
-		using Const_Reverse_DataIterator = std::vector<T>::const_reverse_iterator;
+		using DataIterator = std::list<T>::iterator;
+		using Const_DataIterator = std::list<T>::const_iterator;
+		using Reverse_DataIterator = std::list<T>::reverse_iterator;
+		using Const_Reverse_DataIterator = std::list<T>::const_reverse_iterator;
 
 	private:
 		std::unordered_map<KeyType, size_t> m_indexes;
@@ -31,17 +32,18 @@ namespace snowy
 	public:
 		constexpr GenericDatabase() = default;
 
-		constexpr GenericDatabase( const std::initializer_list<std::tuple<KeyType, DataType>>& init )
+		constexpr GenericDatabase(const std::initializer_list<std::tuple<KeyType, DataType>>& init)
 		{
-			m_data.reserve( init.size() );
-			for ( const auto& [key, value] : init )
+			m_data.reserve(init.size());
+			for (const auto& [key, value] : init)
 			{
-				insert( key, value );
+				insert(key, value);
 			}
 		}
 
 		constexpr ~GenericDatabase()
-		{}
+		{
+		}
 
 		constexpr bool empty() const { return m_data.size() < 1; }
 
@@ -57,9 +59,9 @@ namespace snowy
 		constexpr DataType& back() { return m_data.back(); }
 		constexpr const DataType& back() const { return m_data.back(); }
 
-// Iterators //
+		// Iterators //
 
-// Data Iterators
+		// Data Iterators
 
 		constexpr DataIterator begin() { return m_data.begin(); }
 		constexpr Const_DataIterator begin() const { return m_data.begin(); }
@@ -79,71 +81,83 @@ namespace snowy
 		constexpr Const_DataIterator cend() const { return m_data.cend(); }
 		constexpr Const_Reverse_DataIterator crend() const { return m_data.crend(); }
 
-// Indexing //
+		// Indexing //
 
-		constexpr DataType& at( size_t idx ) { ASSERT( idx < size(), "database subscript out of range" );  return m_data.at( idx ); }
-		constexpr const DataType& at( size_t idx ) const { ASSERT( idx < size(), "database subscript out of range" );  return m_data.at( idx ); }
+		constexpr DataType& at(size_t idx) { ASSERT(idx < size(), "database subscript out of range");  return m_data.at(idx); }
+		constexpr const DataType& at(size_t idx) const { ASSERT(idx < size(), "database subscript out of range");  return m_data.at(idx); }
 
-		constexpr DataType& at( const KeyType& key ) { ASSERT( m_indexes.contains( key ), "database key does not exist" );  return get_or_insert( key ); }
-		constexpr DataType& at( KeyType&& key ) { ASSERT( m_indexes.contains( key ), "database key does not exist" );  return get_or_insert( key ); }
-		constexpr const DataType& at( const KeyType& key ) const { ASSERT( m_indexes.contains( key ), "database key does not exist" ); return get_or_insert( key ); }
+		constexpr DataType& at(const KeyType& key) { ASSERT(m_indexes.contains(key), "database key does not exist");  return get_or_insert(key); }
+		constexpr DataType& at(KeyType&& key) { ASSERT(m_indexes.contains(key), "database key does not exist");  return get_or_insert(key); }
+		constexpr const DataType& at(const KeyType& key) const { ASSERT(m_indexes.contains(key), "database key does not exist"); return get_or_insert(key); }
 
-		constexpr DataType& operator[]( size_t idx ) { DEBUG_ASSERT( idx < size(), "database subscript out of range" );  return m_data[idx]; }
-		constexpr const DataType& operator[]( size_t idx ) const { DEBUG_ASSERT( idx < size(), "database subscript out of range" );  return m_data[idx]; }
+		constexpr DataType& operator[](size_t idx) { DEBUG_ASSERT(idx < size(), "database subscript out of range");  return m_data[idx]; }
+		constexpr const DataType& operator[](size_t idx) const { DEBUG_ASSERT(idx < size(), "database subscript out of range");  return m_data[idx]; }
 
-		constexpr DataType& operator[]( const KeyType& key ) { return get_or_insert( key ); }
-		constexpr DataType& operator[]( KeyType&& key ) { return get_or_insert( key ); }
-		constexpr const DataType& operator[]( const KeyType& key ) const { return get_or_insert( key ); }
+		constexpr DataType& operator[](const KeyType& key) { return get_or_insert(key); }
+		constexpr DataType& operator[](KeyType&& key) { return get_or_insert(key); }
+		constexpr const DataType& operator[](const KeyType& key) const { return get_or_insert(key); }
 
-// Misc //
+		// Misc //
 
-		constexpr void insert( const KeyType& key, const DataType& data ) { get_or_insert( key ) = data; }
+		constexpr void erase(const DataType& data)
+		{
+			m_indexes.erase(find_key(data));
+			m_data.erase(m_data.begin() + find(data));
+		}
+
+		constexpr void remove(const KeyType& key)
+		{
+			m_data.erase(m_data.begin() + m_indexes[key]);
+			m_indexes.erase(key);
+		}
+
+		constexpr void insert(const KeyType& key, const DataType& data) { get_or_insert(key) = data; }
 		constexpr void clear() { m_data.clear(); m_indexes.clear(); }
-		constexpr bool contains( const KeyType& key ) const { return m_indexes.contains( key ); }
+		constexpr bool contains(const KeyType& key) const { return m_indexes.contains(key); }
 
-		constexpr void reserve( size_t reserve_capacity ) { m_data.reserve( reserve_capacity ); }
-		constexpr void resize( size_t new_size ) { m_data.resize( new_size ); }
+		constexpr void reserve(size_t reserve_capacity) { m_data.reserve(reserve_capacity); }
+		constexpr void resize(size_t new_size) { m_data.resize(new_size); }
 		constexpr void shrink_to_fit() { m_data.shrink_to_fit(); }
 
-		constexpr size_t find( const DataType& data ) const
+		constexpr size_t find(const DataType& data) const
 		{
-			for ( size_t i = 0; i < m_data.size(); i++ )
-				if ( m_data[i] == data ) return i;
+			for (size_t i = 0; i < m_data.size(); i++)
+				if (m_data[i] == data) return i;
 
 			return m_data.size();
 		}
 
-		constexpr KeyType find_key( const DataType& data ) const
+		constexpr KeyType find_key(const DataType& data) const
 		{
-			size_t data_index = find( data );
-			for ( const auto& [key, index] : m_indexes )
-				if ( index == data_index ) return key;
+			size_t data_index = find(data);
+			for (const auto& [key, index] : m_indexes)
+				if (index == data_index) return key;
 
-			return KeyType {};
+			return KeyType{};
 		}
 
 		constexpr void print() const
 		{
-			for ( const auto& data : m_data )
-				std::cout << find_key( data ) << ": " << data << std::endl;
+			for (const auto& data : m_data)
+				std::cout << find_key(data) << ": " << data << std::endl;
 		}
 
 	private:
 
-		constexpr DataType& get_or_insert( const KeyType& key, const DataType& data = DataType {} )
+		constexpr DataType& get_or_insert(const KeyType& key, const DataType& data = DataType{})
 		{
-			if ( m_indexes.count( key ) == 0 )
+			if (m_indexes.count(key) == 0)
 			{
 				m_indexes[key] = m_data.size();
-				m_data.push_back( data );
+				m_data.push_back(data);
 			}
 			return m_data[m_indexes[key]];
 		}
 
-		constexpr const DataType get_or_insert( const KeyType& key, const DataType& data = DataType {} ) const
+		constexpr const DataType get_or_insert(const KeyType& key, const DataType& data = DataType{}) const
 		{
-			ASSERT( m_indexes.count( key ) > 0, "database index out of bounds!" );
-			return m_data.at( m_indexes.at( key ) );
+			ASSERT(m_indexes.count(key) > 0, "database index out of bounds!");
+			return m_data.at(m_indexes.at(key));
 		}
 	};
 
@@ -163,23 +177,24 @@ namespace snowy
 
 	private:
 		std::unordered_map<KeyType, size_t> m_indexes;
-		std::array<DataType, Size> m_data {};
-		size_t current_index { 0 };
+		std::array<DataType, Size> m_data{};
+		size_t current_index{ 0 };
 
 	public:
 		constexpr explicit StaticGenericDatabase() = default;
 
-		constexpr StaticGenericDatabase( const std::initializer_list<std::tuple<K, T>>& init )
+		constexpr StaticGenericDatabase(const std::initializer_list<std::tuple<K, T>>& init)
 		{
-			for ( const auto& [key, value] : init )
+			for (const auto& [key, value] : init)
 			{
-				if ( current_index >= Size ) break;
-				insert( key, value );
+				if (current_index >= Size) break;
+				insert(key, value);
 			}
 		}
 
 		constexpr ~StaticGenericDatabase()
-		{}
+		{
+		}
 
 		constexpr bool empty() const { return m_data.size() < 1; }
 
@@ -194,9 +209,9 @@ namespace snowy
 		constexpr DataType& back() { return m_data.back(); }
 		constexpr const DataType& back() const { return m_data.back(); }
 
-// Iterators //
+		// Iterators //
 
-// Data Iterators
+		// Data Iterators
 
 		constexpr DataIterator begin() { return m_data.begin(); }
 		constexpr Const_DataIterator begin() const { return m_data.begin(); }
@@ -216,59 +231,71 @@ namespace snowy
 		constexpr Const_DataIterator cend() const { return m_data.cend(); }
 		constexpr Const_Reverse_DataIterator crend() const { return m_data.crend(); }
 
-// Indexing //
+		// Indexing //
 
-		constexpr DataType& at( size_t idx ) { ASSERT( idx < Size, "static database subscript out of range" );  return m_data.at( idx ); }
-		constexpr const DataType& at( size_t idx ) const { ASSERT( idx < Size, "static database subscript out of range" );  return m_data.at( idx ); }
+		constexpr DataType& at(size_t idx) { ASSERT(idx < Size, "static database subscript out of range");  return m_data.at(idx); }
+		constexpr const DataType& at(size_t idx) const { ASSERT(idx < Size, "static database subscript out of range");  return m_data.at(idx); }
 
-		constexpr DataType& at( const KeyType& key ) { ASSERT( m_indexes.contains( key ), "static database key does not exist" );  return get_or_insert( key ); }
-		constexpr DataType& at( KeyType&& key ) { ASSERT( m_indexes.contains( key ), "static database key does not exist" );  return get_or_insert( key ); }
-		constexpr const DataType& at( const KeyType& key ) const { ASSERT( m_indexes.contains( key ), "static database key does not exist" ); return get_or_insert( key ); }
+		constexpr DataType& at(const KeyType& key) { ASSERT(m_indexes.contains(key), "static database key does not exist");  return get_or_insert(key); }
+		constexpr DataType& at(KeyType&& key) { ASSERT(m_indexes.contains(key), "static database key does not exist");  return get_or_insert(key); }
+		constexpr const DataType& at(const KeyType& key) const { ASSERT(m_indexes.contains(key), "static database key does not exist"); return get_or_insert(key); }
 
-		constexpr DataType& operator[]( size_t idx ) { DEBUG_ASSERT( idx < Size, "static database subscript out of range" );  return m_data[idx]; }
-		constexpr const DataType& operator[]( size_t idx ) const { DEBUG_ASSERT( idx < Size, "static database subscript out of range" );  return m_data[idx]; }
+		constexpr DataType& operator[](size_t idx) { DEBUG_ASSERT(idx < Size, "static database subscript out of range");  return m_data[idx]; }
+		constexpr const DataType& operator[](size_t idx) const { DEBUG_ASSERT(idx < Size, "static database subscript out of range");  return m_data[idx]; }
 
-		constexpr DataType& operator[]( const KeyType& key ) { return get_or_insert( key ); }
-		constexpr DataType& operator[]( KeyType&& key ) { return get_or_insert( key ); }
-		constexpr const DataType& operator[]( const KeyType& key ) const { return get_or_insert( key ); }
+		constexpr DataType& operator[](const KeyType& key) { return get_or_insert(key); }
+		constexpr DataType& operator[](KeyType&& key) { return get_or_insert(key); }
+		constexpr const DataType& operator[](const KeyType& key) const { return get_or_insert(key); }
 
-// Misc //
+		// Misc //
 
-		constexpr void insert( const KeyType& key, const DataType& data ) { get_or_insert( key ) = data; }
-		constexpr void clear() { m_data.fill( DataType {} ); m_indexes.clear(); }
-		constexpr bool contains( const KeyType& key ) const { return m_indexes.contains( key ); }
-		constexpr bool contains( const DataType& data ) const { return find( data ) < size(); }
-
-		constexpr size_t find( const DataType& data ) const
+		constexpr void erase(const DataType& data)
 		{
-			for ( size_t i = 0; i < m_data.size(); i++ )
-				if ( m_data[i] == data ) return i;
+			m_indexes.erase(find_key(data));
+			m_data.erase(find(data));
+		}
+
+		constexpr void remove(const KeyType& key)
+		{
+			m_data.erase(find(m_indexes[key]));
+			m_indexes.erase(key);
+		}
+
+		constexpr void insert(const KeyType& key, const DataType& data) { get_or_insert(key) = data; }
+		constexpr void clear() { m_data.fill(DataType{}); m_indexes.clear(); }
+		constexpr bool contains(const KeyType& key) const { return m_indexes.contains(key); }
+		constexpr bool contains(const DataType& data) const { return find(data) < size(); }
+
+		constexpr size_t find(const DataType& data) const
+		{
+			for (size_t i = 0; i < m_data.size(); i++)
+				if (m_data[i] == data) return i;
 
 			return size();
 		}
 
-		constexpr KeyType find_key( const DataType& data ) const
+		constexpr KeyType find_key(const DataType& data) const
 		{
-			size_t data_index = find( data );
-			for ( const auto& [key, index] : m_indexes )
-				if ( index == data_index ) return key;
+			size_t data_index = find(data);
+			for (const auto& [key, index] : m_indexes)
+				if (index == data_index) return key;
 
-			return KeyType {};
+			return KeyType{};
 		}
 
 		constexpr void print() const
 		{
-			for ( const auto& data : m_data )
-				std::cout << find_key( data ) << ": " << data << std::endl;
+			for (const auto& data : m_data)
+				std::cout << find_key(data) << ": " << data << std::endl;
 		}
 
 	private:
 
-		constexpr DataType& get_or_insert( const KeyType& key, const DataType& data = DataType {} )
+		constexpr DataType& get_or_insert(const KeyType& key, const DataType& data = DataType{})
 		{
-			if ( m_indexes.count( key ) == 0 )
+			if (m_indexes.count(key) == 0)
 			{
-				ASSERT( current_index < Size, "static database index out of bounds!" );
+				ASSERT(current_index < Size, "static database index out of bounds!");
 
 				m_indexes[key] = current_index;
 				m_data[current_index] = data;
@@ -278,15 +305,83 @@ namespace snowy
 			return m_data[m_indexes[key]];
 		}
 
-		constexpr const DataType get_or_insert( const KeyType& key, const DataType& data = DataType {} ) const
+		constexpr const DataType get_or_insert(const KeyType& key, const DataType& data = DataType{}) const
 		{
-			ASSERT( m_indexes.count( key ) > 0, "static database index out of bounds!" );
-			return m_data.at( m_indexes.at( key ) );
+			ASSERT(m_indexes.count(key) > 0, "static database index out of bounds!");
+			return m_data.at(m_indexes.at(key));
 		}
 	};
 
 	template<typename T, size_t Size>
 	using StaticDatabase = StaticGenericDatabase<StringID, T, Size>;
+
+	template<typename K, typename T>
+	class GenericSingletonDatabase
+	{
+		using KeyType = K;
+		using DataType = T;
+
+		using GenericSingletonDatabaseType = GenericSingletonDatabase<K, T>;
+		using DatabaseType = GenericDatabase<KeyType, DataType>;
+
+	private:
+		DatabaseType m_database;
+
+		GenericSingletonDatabase() {}
+		~GenericSingletonDatabase() {}
+
+		static GenericSingletonDatabaseType& get()
+		{
+			static GenericSingletonDatabaseType singleton;
+			return singleton;
+		}
+
+	public:
+
+		GenericSingletonDatabase(GenericSingletonDatabaseType const&) = delete;
+		void operator=(GenericSingletonDatabaseType const&) = delete;
+
+		constexpr static void init()
+		{
+			get();
+		}
+
+		constexpr static bool has(const KeyType& id)
+		{
+			return get().m_database.contains(id);
+		}
+
+		constexpr static DataType get(const KeyType& id)
+		{
+			return get().m_database[id];
+		}
+
+		constexpr static void add(const KeyType& id, DataType data)
+		{
+			get().m_database.insert(id, data);
+		}
+
+		constexpr static void erase(const DataType& data)
+		{
+			get().m_database.erase(data);
+		}
+
+		constexpr static void remove(const KeyType& id)
+		{
+			get().m_database.remove(id);
+		}
+
+		constexpr static void add(const std::initializer_list<std::tuple<KeyType, DataType>>& init)
+		{
+			for (const auto& [id, data] : init)
+			{
+				get().m_database.insert(id, data);
+			}
+		}
+	};
+
+	template<typename T>
+	using SingletonDatabase = GenericSingletonDatabase<StringID, T>;
 }
 
 #endif // !_SNOWY_DATABASE_H

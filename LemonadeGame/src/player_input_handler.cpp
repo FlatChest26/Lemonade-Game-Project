@@ -2,52 +2,9 @@
 
 #include "action.h"
 #include "direction_action.h"
+#include "game.h"
 
 #include "world_state.h"
-
-
-std::weak_ptr<WorldGameState> PlayerInputHandler::get_world_state()
-{
-	if (auto game_state = get_game_state().lock())
-	{
-		if (game_state->is_world_game_state())
-		{
-			return std::dynamic_pointer_cast<WorldGameState>(game_state);
-		}
-	}
-
-	return {};
-}
-
-std::shared_ptr<Entity> PlayerInputHandler::get_player()
-{
-	if (auto world_state = get_world_state().lock())
-	{
-		return world_state->get_player();
-	}
-
-	return nullptr;
-}
-
-std::shared_ptr<World> PlayerInputHandler::get_world()
-{
-	if (auto world_state = get_world_state().lock())
-	{
-		return world_state->get_world();
-	}
-
-	return nullptr;
-}
-
-std::shared_ptr<Camera> PlayerInputHandler::get_camera()
-{
-	if (auto world_state = get_world_state().lock())
-	{
-		return world_state->get_camera();
-	}
-
-	return nullptr;
-}
 
 #include <SDL_keycode.h>
 #include <map>
@@ -78,27 +35,29 @@ InputResult PlayerInputHandler::ev_key_down(SDL_Event event)
 		return InputResult();
 	}
 
-	if (player->has_action())
+	// Don't add a new action if one is already being done.
+	if (player->has_any_action())
+	{
 		return InputResult(InputResult::Type::Action);
+	}
 
 	auto scancode = event.key.keysym.scancode;
 	auto sym = event.key.keysym.sym;
 	auto mod = event.key.keysym.mod;
 
-	
 	if (mod & KMOD_SHIFT)
 	{
 		switch (sym)
 		{
 		case SDLK_PERIOD:
 		{
-			player->add_action(std::make_shared<BumpAction>(TimeUnit(0.0), player, (Coord) 0, (Coord) 0, (Coord) -1));
+			player->queue_action(std::make_unique<BumpAction>(player, (Coord)0, (Coord)0, (Coord)-1));
 
 			return InputResult(InputResult::Type::Action);
 		}
 		case SDLK_COMMA:
 		{
-			player->add_action(std::make_shared<BumpAction>(TimeUnit(0.0), player, (Coord) 0, (Coord) 0, (Coord) 1));
+			player->queue_action(std::make_unique<BumpAction>(player, (Coord)0, (Coord)0, (Coord)1));
 
 			return InputResult(InputResult::Type::Action);
 		}
@@ -107,20 +66,59 @@ InputResult PlayerInputHandler::ev_key_down(SDL_Event event)
 
 	switch (sym)
 	{
+	case SDLK_ESCAPE:
+	{
+		if (auto game = get_game())
+		{
+			game->stop_running();
+		}
+
+		break;
+	}
 	case SDLK_F1:
 	{
-		COUT(player->pos());
+		if (auto world_state = get_world_state())
+		{
+			world_state->set_run_speed(runspeed_flag::TURN_BASED);
+		}
+
+		break;
+	}
+	case SDLK_F2:
+	{
+		if (auto world_state = get_world_state())
+		{
+			world_state->set_run_speed(runspeed_flag::REAL_TIME);
+		}
+
+		break;
+	}
+	case SDLK_F3:
+	{
+		if (auto world_state = get_world_state())
+		{
+			world_state->set_run_speed(runspeed_flag::REAL_TIME_2X);
+		}
+
+		break;
+	}
+	case SDLK_F4:
+	{
+		if (auto world_state = get_world_state())
+		{
+			world_state->set_run_speed(runspeed_flag::REAL_TIME_4X);
+		}
 
 		break;
 	}
 	case SDLK_PERIOD: case SDLK_KP_5:
 	{
-		player->add_action(std::make_shared<WaitAction>(TimeUnit(1.0), player));
+		player->queue_action(std::make_unique<WaitAction>(TimeUnit::from_seconds(1.0), player));
 		return InputResult(InputResult::Type::Action);
 	}
 	case SDLK_COMMA:
 	{
-		player->add_action(std::make_shared<WaitAction>(TimeUnit(10.0), player));
+		player->queue_action(std::make_unique<WaitAction>(TimeUnit::from_seconds(10.0), player));
 
 		return InputResult(InputResult::Type::Action);
 	}
@@ -142,7 +140,7 @@ InputResult PlayerInputHandler::ev_key_down(SDL_Event event)
 				dz = -1;
 			}
 
-			player->add_action(std::make_shared<BumpAction>(TimeUnit(0.0), player, move_dir.x, move_dir.y, move_dir.z + dz));
+			player->queue_action(std::make_unique<BumpAction>(player, move_dir.x, move_dir.y, move_dir.z + dz));
 			return InputResult(InputResult::Type::Action);
 		}
 	}

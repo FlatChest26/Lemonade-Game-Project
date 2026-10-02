@@ -38,9 +38,9 @@ namespace files
 
 		data_directory = root_directory / "data";
 
-		if ( !std::filesystem::exists( data_directory ) )
+		if (!std::filesystem::exists(data_directory))
 		{
-			FILES_COUT( "Error: Could not find the data directory." );
+			FILES_COUT("Error: Could not find the data directory.");
 			return false;
 		}
 
@@ -48,9 +48,9 @@ namespace files
 
 		// Check data/config exists
 
-		if ( !std::filesystem::exists( data_directory / "config" ) )
+		if (!std::filesystem::exists(data_directory / "config"))
 		{
-			FILES_COUT( "Error: Data directory found but could not find a data/config directory." );
+			FILES_COUT("Error: Data directory found but could not find a data/config directory.");
 			return false;
 		}
 		else
@@ -60,9 +60,9 @@ namespace files
 
 		// Check data/graphics exists
 
-		if ( !std::filesystem::exists( data_directory / "graphics" ) )
+		if (!std::filesystem::exists(data_directory / "graphics"))
 		{
-			FILES_COUT( "Error: Data directory found but could not find a data/graphics directory." );
+			FILES_COUT("Error: Data directory found but could not find a data/graphics directory.");
 			return false;
 		}
 		else
@@ -70,7 +70,7 @@ namespace files
 			graphics_directory = data_directory / "graphics";
 		}
 
-		FILES_COUT( "Found data directory: " << data_directory.generic_string() );
+		FILES_COUT("Found data directory: " << data_directory.generic_string());
 
 		return true;
 	}
@@ -82,25 +82,25 @@ namespace files
 
 		raws_directory = root_directory / "raws";
 
-		if ( !std::filesystem::exists( raws_directory ) )
+		if (!std::filesystem::exists(raws_directory))
 		{
-			FILES_COUT( "Error: Could not find the raws directory." );
+			FILES_COUT("Error: Could not find the raws directory.");
 			return false;
 		}
 
-		if ( !std::filesystem::exists( raws_directory / "core" ) )
+		if (!std::filesystem::exists(raws_directory / "core"))
 		{
-			FILES_COUT( "Error: Raws directory found but could not find a raws/core directory." );
+			FILES_COUT("Error: Raws directory found but could not find a raws/core directory.");
 			return false;
 		}
 
-		if ( !std::filesystem::exists( raws_directory / "mods" ) )
+		if (!std::filesystem::exists(raws_directory / "mods"))
 		{
-			FILES_COUT( "Error: Raws directory found but could not find a raws/mods directory." );
+			FILES_COUT("Error: Raws directory found but could not find a raws/mods directory.");
 			return false;
 		}
 
-		FILES_COUT( "Found raws directory: " << raws_directory.generic_string() );
+		FILES_COUT("Found raws directory: " << raws_directory.generic_string());
 
 		return true;
 	}
@@ -109,14 +109,14 @@ namespace files
 	inline bool validate_root_directory()
 	{
 		// Get Root Directory
-		root_directory = FilePath { "." };
+		root_directory = FilePath{ "." };
 
-		while ( !std::filesystem::exists( root_directory / "data" ) )
+		while (!std::filesystem::exists(root_directory / "data"))
 		{
 			root_directory /= "..";
-			if ( !std::filesystem::exists( root_directory ) )
+			if (!std::filesystem::exists(root_directory))
 			{
-				FILES_COUT( "Error: Could not find the data directory." );
+				FILES_COUT("Error: Could not find the data directory.");
 				return false;
 			}
 		}
@@ -127,11 +127,11 @@ namespace files
 
 inline bool validate_filesystem()
 {
-	VALIDATE_OR_RET( files::validate_root_directory(), "Failed to validate root directory." );
-	VALIDATE_OR_RET( files::validate_data_directory(), "Failed to validate data directory." );
+	VALIDATE_OR_RET(files::validate_root_directory(), "Failed to validate root directory.");
+	VALIDATE_OR_RET(files::validate_data_directory(), "Failed to validate data directory.");
 
 #ifndef SNOWY__NO_RAWS_DIR
-	VALIDATE_OR_RET( files::validate_raws_directory(), "Failed to validate raws directory." );
+	VALIDATE_OR_RET(files::validate_raws_directory(), "Failed to validate raws directory.");
 #endif
 
 	files::filesystem_initialized = true;

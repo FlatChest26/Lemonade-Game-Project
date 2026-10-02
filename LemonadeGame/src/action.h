@@ -1,15 +1,21 @@
 #pragma once
 
+#ifndef LEMONADE_GAME_SRC_ACTION_H
+#define LEMONADE_GAME_SRC_ACTION_H
+
 #include "time_units.h"
-#include "transforms.h"
 #include <memory>
 #include <vector>
+#include <string>
+#include <utility>
 
 class Action;
 class Entity;
 class World;
 class WorldGameState;
 class TileMap;
+
+using ActionQueue = std::vector<std::unique_ptr<Action>>;
 
 struct ActionResponse
 {
@@ -22,12 +28,17 @@ struct ActionResponse
 struct ActionResult
 {
 	bool success{ false };
-	ActionResponse response{""};
-	std::vector<std::shared_ptr<Action>> next_actions{ };
+	ActionResponse response{ "" };
+	ActionQueue next_actions{};
 
 	constexpr bool has_next_action() const { return !next_actions.empty(); }
 
-	std::shared_ptr<Action> get_next_action()
+	void add_next_action(std::unique_ptr<Action> action)
+	{
+		next_actions.push_back(std::move(action));
+	}
+
+	std::unique_ptr<Action> get_next_action()
 	{
 		if (has_next_action())
 		{
@@ -36,6 +47,7 @@ struct ActionResult
 
 			return next_action;
 		}
+
 		return nullptr;
 	}
 };
@@ -43,13 +55,14 @@ struct ActionResult
 class Action
 {
 protected:
-	std::shared_ptr<Entity> m_actor{ nullptr };
-	TimeUnit m_action_length{ 0.0 };
+	Entity* m_actor{ nullptr };
+	TimeUnit m_action_length{ TimeUnit::none() };
 
 public:
-	Action(const TimeUnit& action_length = TimeUnit(0.0), std::shared_ptr<Entity> actor = nullptr): 
+	Action(const TimeUnit& action_length = TimeUnit::none(), Entity* actor = nullptr) :
 		m_action_length(action_length), m_actor(actor)
-	{}
+	{
+	}
 
 	virtual ActionResult perform();
 
@@ -70,16 +83,16 @@ public:
 
 	virtual bool check_action() { return true; }
 
-	virtual std::shared_ptr<Entity> get_actor() const;
-	virtual std::weak_ptr<World> get_world() const;
-	virtual std::shared_ptr<TileMap> get_tile_map() const;
-	virtual std::weak_ptr<WorldGameState> get_world_game_state() const;
+	virtual Entity* get_actor() const;
+	virtual World* get_world() const;
+	virtual TileMap* get_tile_map() const;
+	virtual WorldGameState* get_world_game_state() const;
 };
 
 class WaitAction : public Action
 {
 public:
-	WaitAction(const TimeUnit& action_length = TimeUnit(1.0), std::shared_ptr<Entity> actor = nullptr) :
+	WaitAction(const TimeUnit& action_length = TimeUnit::from_seconds(1.0), Entity* actor = nullptr) :
 		Action(action_length, actor)
 	{
 	}
@@ -94,3 +107,5 @@ public:
 		return "wait action";
 	}
 };
+
+#endif // !LEMONADE_GAME_SRC_ACTION_H

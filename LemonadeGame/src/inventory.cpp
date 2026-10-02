@@ -1,11 +1,11 @@
 #include "inventory.h"
 
-Inventory::Inventory(std::weak_ptr<Entity> owner, std::vector<std::shared_ptr<Entity>> items, size_t max_slots):
+Inventory::Inventory(Entity* owner, size_t max_slots, std::vector<Entity*> items) :
 	m_owner(owner), m_items(items), m_max_slots(max_slots)
 {
 }
 
-bool Inventory::add_item(std::shared_ptr<Entity> item)
+bool Inventory::add_item(Entity* item)
 {
 	if (m_items.size() >= m_max_slots)
 		return false;
@@ -15,7 +15,7 @@ bool Inventory::add_item(std::shared_ptr<Entity> item)
 	return true;
 }
 
-bool Inventory::remove_item(std::shared_ptr<Entity> item)
+bool Inventory::remove_item(Entity* item)
 {
 	auto it = std::find(m_items.begin(), m_items.end(), item);
 

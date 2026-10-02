@@ -1,9 +1,12 @@
 #pragma once
 
+#ifndef LEMONADE_GAME_SRC_TILE_MAP_H
+#define LEMONADE_GAME_SRC_TILE_MAP_H
+
 #include "tile.h"
 #include "time_units.h"
 #include "render_params.h"
-#include "tile_data.h"
+#include "tile_type.h"
 
 #include <iostream>
 
@@ -18,10 +21,10 @@ namespace tile_map
 	inline Tile VOID_TILE{ &tile_types::NO_TILE, 0 };
 }
 
-class TileMap 
+class TileMap
 {
 protected:
-	std::weak_ptr<World> m_world;
+	World* m_world;
 	std::vector<Tile> m_tiles;
 
 	Length m_width{ tile_map::DEFAULT_WIDTH };
@@ -29,7 +32,7 @@ protected:
 	Length m_depth{ tile_map::DEFAULT_DEPTH };
 
 public:
-	TileMap(const std::weak_ptr<World>& world = {}, const Length& width = tile_map::DEFAULT_WIDTH, const Length& height = tile_map::DEFAULT_HEIGHT, const Length& depth = tile_map::DEFAULT_DEPTH);
+	TileMap(World* world = {}, const Length& width = tile_map::DEFAULT_WIDTH, const Length& height = tile_map::DEFAULT_HEIGHT, const Length& depth = tile_map::DEFAULT_DEPTH);
 
 public:
 	// -- Getters -- //
@@ -37,7 +40,7 @@ public:
 	Length get_width() const { return m_width; }
 	Length get_height() const { return m_height; }
 	Length get_depth() const { return m_depth; }
-	
+
 	// Returns a pointer to the tile at the given coordinates. If the coordinates are out of bounds, returns a pointer to the void tile.
 	Tile* get_tile(const Coord& x, const Coord& y, const Coord& z)
 	{
@@ -63,7 +66,7 @@ public:
 
 	constexpr bool in_bounds(const Coord& x, const Coord& y, const Coord& z) const
 	{
-		return x >= 0 && (Length) x < m_width && y >= 0 && (Length) y < m_height && z >= 0 && (Length) z < m_depth;
+		return x >= 0 && (Length)x < m_width && y >= 0 && (Length)y < m_height && z >= 0 && (Length)z < m_depth;
 	}
 
 	constexpr bool in_bounds(const Position& position) const
@@ -88,7 +91,7 @@ public:
 
 	void update_all_tiles()
 	{
-		for (Coord x = 0; (Length) x < m_width; ++x) for (Coord y = 0; (Length)y < m_height; ++y) for (Coord z = 0; (Length) z < m_depth; ++z)
+		for (Coord x = 0; (Length)x < m_width; ++x) for (Coord y = 0; (Length)y < m_height; ++y) for (Coord z = 0; (Length)z < m_depth; ++z)
 		{
 			update_tile_at(x, y, z);
 		}
@@ -101,14 +104,18 @@ public:
 	void compute_fov(const Coord& pov_x, const Coord& pov_y, const Coord& pov_z, const Coord& radius);
 	void fov_mark_visible(const Coord& x, const Coord& y, const Coord& z, bool visible = true);
 
-	bool fov_is_blocked(const Coord& x, const Coord& y, const Coord& z, const Position& pov) const;
+	bool is_opaque(const Coord& x, const Coord& y, const Coord& z) const;
+	bool is_opaque(const Position& pos) const
+	{
+		return is_opaque(pos.x, pos.y, pos.z);
+	}
 
 	bool is_visible(const Coord& x, const Coord& y, const Coord& z) const;
 	bool is_visible(const Position& pos) const { return is_visible(pos.x, pos.y, pos.z); }
 
 	bool is_explored(const Coord& x, const Coord& y, const Coord& z) const;
 	bool is_explored(const Position& pos) const { return is_explored(pos.x, pos.y, pos.z); }
-	
+
 	// -- Checks -- //
 
 	bool is_blocked(const Coord& x, const Coord& y, const Coord& z) const
@@ -116,12 +123,14 @@ public:
 		const Tile* tile = get_tile(x, y, z);
 		return !tile->is_walkable();
 	}
-	
+
 public:
 
 	// -- Game Loop -- //
 
 	virtual void step(TimeUnit time_delta);
 	virtual void update();
-	virtual void render(RenderParams params) const;
+	// virtual void render(RenderParams params) const;
 };
+
+#endif // !LEMONADE_GAME_SRC_TILE_MAP_H

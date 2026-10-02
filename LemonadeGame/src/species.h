@@ -3,16 +3,30 @@
 #include "snowy_grammar.h"
 #include "renderable.h"
 #include "snowy_database.h"
+#include "anatomy.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 struct Species
 {
-	const char* ID;
-	Noun noun;
-	Renderable renderable;
+	std::string ID;
+	Noun noun{ "unknown creature", "unknown creatures" };
+	std::string adjective{ noun.singular };
 
-	bool operator==( const Species& other ) const { return other.ID == ID; }
+	Renderable renderable{ '@', color::get("cyan"), color::get("black") };
+
+	BodyPlan default_body_plan{ body_plan::GenericBody };
+	std::vector<BodyMod> body_mods;
+
+	std::string description{ "A generic species." };
+
+	bool operator==(const Species& other) const { return other.ID == ID; }
+
+	static Species from_json(const json& j);
 };
+
+using SpeciesDB = snowy::SingletonDatabase<std::shared_ptr<Species>>;
 
 namespace species
 {
@@ -20,45 +34,11 @@ namespace species
 	{
 		.ID = "HUMAN",
 		.noun = { "human", "humans" },
-		.renderable = {'U', color::get( "cyan" ), color::get( "black" ) }
+		.renderable = {'U', color::get("cyan"), color::get("black") }
 	};
 
-	inline Species DEMON
+	static inline void initialize_species_db()
 	{
-		.ID = "DEMON",
-		.noun = { "demon", "demons" },
-		.renderable = {'&', color::get( "dark_red" ), color::get( "black" )}
-	};
-
-	inline Species ANGEL
-	{
-		.ID = "ANGEL",
-		.noun = { "angel", "angels" },
-		.renderable = {142, color::get( "yellow" ), color::get( "black" ) }
-	};
-
-	inline Species DRAGONBORN
-	{
-		.ID = "DRAGONBORN",
-		.noun = { "dragonborn", "dragonborns" },
-		.renderable = {'d', { 0xFF, 0x80, 0x00 }, color::get( "black" ) }
-	};
-
-	inline snowy::Database<Species> species_db
-	{
-		{ "HUMAN",		HUMAN		},
-		{ "DEMON",		DEMON		},
-		{ "ANGEL",		ANGEL		},
-		{ "DRAGONBORN", DRAGONBORN	},
-	};
-
-	inline constexpr Species get( const snowy::StringID& species_name )
-	{
-		if ( !species_db.contains( species_name ) )
-		{
-			return HUMAN;
-		}
-
-		return species_db[species_name];
+		SpeciesDB::init();
 	}
 }

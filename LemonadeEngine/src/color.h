@@ -6,18 +6,24 @@
 #include <string>
 #include <libtcod/color.h>
 
+#include "snowy_macros.h"
+
 #include "snowy_database.h"
+
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 typedef TCOD_color_t	color_t;
 typedef int				glyph_t;
 
 #define DEFAULT_FG_COLOR	color::get("white")
 #define DEFAULT_BG_COLOR	color::get("black")
+
 constexpr glyph_t DEFAULT_GLPYH = ' ';
 
 namespace color
 {
-	inline constexpr size_t COLORS_AMOUNT = 25;
+	inline constexpr size_t COLORS_AMOUNT = 23;
 
 	inline snowy::StaticDatabase<color_t, COLORS_AMOUNT> colors_db
 	{
@@ -44,13 +50,11 @@ namespace color
 		{ "cyan",			{ 0x00, 0xFF, 0xFF } },
 		{ "dark_cyan",		{ 0x00, 0x80, 0x80 } },
 		{ "light_cyan",		{ 0x80, 0xFF, 0xFF } },
-		{ "unexplored",		{ 0, 0, 0 } },
-		{ "explored",		{ 50, 45, 40 } },
 	};
 
-	inline constexpr color_t get( const snowy::StringID& color_name )
+	inline constexpr color_t get(const snowy::StringID& color_name)
 	{
-		if ( !colors_db.contains( color_name ) )
+		if (!colors_db.contains(color_name))
 		{
 			CERR("Unrecognized color: " << color_name);
 			return DEFAULT_FG_COLOR;
@@ -59,14 +63,65 @@ namespace color
 		return colors_db[color_name];
 	}
 
-	inline constexpr std::string get_name_of_color( const color_t& color )
+	inline constexpr std::string get_name_of_color(const color_t& color)
 	{
-		if ( !colors_db.contains( color ) )
+		if (!colors_db.contains(color))
 		{
 			return "<undefined color>";
 		}
 
-		return colors_db.find_key( color );
+		return colors_db.find_key(color);
+	}
+
+	inline constexpr color_t from_hex_code(const std::string& hex_code)
+	{
+		if (!hex_code.starts_with("0x"))
+		{
+			CERR("Hex code must start with '0x': " << hex_code);
+			return DEFAULT_FG_COLOR;
+		}
+
+		if (hex_code.size() != 8)
+		{
+			CERR("Hex code must be 8 characters long (including '0x'): " << hex_code);
+			return DEFAULT_FG_COLOR;
+		}
+
+		uint8_t r = std::stoi(hex_code.substr(2, 2), nullptr, 16);
+		uint8_t g = std::stoi(hex_code.substr(4, 2), nullptr, 16);
+		uint8_t b = std::stoi(hex_code.substr(6, 2), nullptr, 16);
+
+		return { r, g, b };
+	}
+
+	inline constexpr color_t from_rgb(uint8_t r, uint8_t g, uint8_t b)
+	{
+		return { r, g, b };
+	}
+
+	inline constexpr color_t from_json(const json& j)
+	{
+		if (j.is_string())
+		{
+			if (j.get<std::string>().starts_with("0x"))
+			{
+				return from_hex_code(j.get<std::string>());
+			}
+			else
+			{
+				return get(j.get<std::string>());
+			}
+		}
+		else if (j.is_array() && j.size() == 3)
+		{
+			uint8_t r = j[0].get<uint8_t>();
+			uint8_t g = j[1].get<uint8_t>();
+			uint8_t b = j[2].get<uint8_t>();
+			return { r, g, b };
+		}
+
+		CERR("Invalid color JSON: " << j);
+		return DEFAULT_FG_COLOR;
 	}
 }
 

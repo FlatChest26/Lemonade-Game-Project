@@ -110,6 +110,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>C:\Users\Romeo\source\repos\LemonadeGameProject\LemonadeEngine\include;C:\Users\Romeo\source\repos\LemonadeGameProject\LemonadeEngine\include\libtcod;C:\Users\Romeo\source\repos\LemonadeGameProject\LemonadeEngine\include\SDL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

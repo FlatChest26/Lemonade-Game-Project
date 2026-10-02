@@ -1,0 +1,124 @@
+#include "anatomy.h"
+#include "units.h"
+
+Anatomy::Anatomy(BodyPlan bd_plan, std::vector<BodyMod> bd_mods) :
+	m_height(bd_plan.height), m_weight(bd_plan.weight)
+{
+	for (auto& bp : bd_plan.body_parts)
+	{
+		add_body_part(bp);
+	}
+
+	for (auto& bdm : bd_mods)
+	{
+		if (bdm.set_height > 0_ft)
+		{
+			m_height = bdm.set_height;
+		}
+
+		m_height += bdm.add_height;
+		m_height *= bdm.multiply_height;
+
+		if (bdm.set_weight > 0_lb)
+		{
+			m_weight = bdm.set_weight;
+		}
+
+		m_weight += bdm.add_weight;
+		m_weight *= bdm.multiply_weight;
+
+		for (auto& bp : bdm.add_parts)
+		{
+			add_body_part(bp);
+		}
+
+		for (auto& bp_id : bdm.remove_parts)
+		{
+			remove_body_part(bp_id);
+		}
+
+		for (auto& [bp_id, bp] : bdm.replace_parts)
+		{
+			remove_body_part(bp_id);
+			add_body_part(bp);
+		}
+	}
+
+	for (auto& bc : bd_plan.body_connections)
+	{
+		add_body_connection(bc);
+	}
+
+	for (auto& bdm : bd_mods)
+	{
+		for (auto& bc : bdm.add_connections)
+		{
+			add_body_connection(bc);
+		}
+	}
+	
+}
+
+BodyPart* Anatomy::add_body_part(const BodyPartPlan& bp_plan)
+{
+	auto bp = std::make_unique<BodyPart>(m_owner, bp_plan.ID, bp_plan.type, bp_plan.rel_size, bp_plan.position, bp_plan.prefix);
+	m_body_parts.push_back(std::move(bp));
+	
+	if (!root)
+	{
+		root = m_body_parts.back().get();
+	}	
+
+	return m_body_parts.back().get();
+}
+
+bool Anatomy::add_body_connection(const BodyConnectionPlan& bc_plan)
+{
+	BodyPart* parent = get_body_part(bc_plan.parent);
+	BodyPart* child = get_body_part(bc_plan.child);
+
+	if (!parent || !child)
+	{
+		CERR("Anatomy::add_body_connection: One or both body parts not found: " << bc_plan.parent << ", " << bc_plan.child);
+		return false;
+	}
+
+	m_connections.push_back(BodyConnection(parent, child));
+
+	return true;
+}
+
+bool Anatomy::add_body_relation(const BodyConnectionPlan& bc_plan)
+{
+	BodyPart* parent = get_body_part(bc_plan.parent);
+	BodyPart* child = get_body_part(bc_plan.child);
+
+	if (!parent || !child)
+	{
+		CERR("Anatomy::add_body_relation: One or both body parts not found: " << bc_plan.parent << ", " << bc_plan.child);
+		return false;
+	}
+
+	m_relations.push_back(BodyConnection(parent, child));
+
+	return true;
+}
+
+
+bool Anatomy::remove_body_part(BodyPartID bp_ID)
+{
+	if (!has_body_part(bp_ID))
+	{
+		return false;
+	}
+
+	for (auto& bp : m_body_parts)
+	{
+		if (bp->ID() == bp_ID)
+		{
+			bp.reset();
+		}
+	}
+
+	return true;
+}

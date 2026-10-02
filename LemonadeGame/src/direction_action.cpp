@@ -3,42 +3,33 @@
 #include "misc_actions.h"
 
 #include "world.h"
-
+#include "entity.h"
 #include "snowy_macros.h"
+#include "time_units.h"
+
+#include <algorithm>
+#include <cmath>
 #include <memory>
+#include <utility>
+
+ActionWithDirection::ActionWithDirection(const TimeUnit& action_length, Entity* actor, const Coord& dx, const Coord& dy, const Coord& dz) :
+	Action(action_length, actor), m_dx(dx), m_dy(dy), m_dz(dz)
+{
+}
+
+BumpAction::BumpAction(Entity* actor, const Coord& dx, const Coord& dy, const Coord& dz) :
+	ActionWithDirection(TimeUnit::none(), actor, dx, dy, dz)
+{
+}
+
+MovementAction::MovementAction(const TimeUnit& action_length, Entity* entity, const Coord& dx, const Coord& dy, const Coord& dz) :
+	ActionWithDirection(action_length, entity, dx, dy, dz)
+{
+}
 
 ActionResult BumpAction::perform()
 {
-	auto tile_map = get_tile_map();
-
-	if (tile_map && tile_map->in_bounds(destination()))
-	{
-		auto dest = destination();
-
-		if (tile_map->get_tile(dest)->can_open())
-		{
-			return ActionResult{ true, "", { std::make_shared<OpenAction>(TimeUnit(1.0), get_actor(), dest) } };
-		}
-	}
-
-	if (auto world = get_world().lock())
-	{
-		auto blocking = world->get_blocking_entities_at(destination());
-		for (auto& entity : blocking)
-		{
-			if (entity != get_actor() /* && entity->is_animate() && !entity->fixed_in_place()*/)
-			{
-				return ActionResult{ true, "", { std::make_shared<SwapPlacesAction>(TimeUnit(1.0), get_actor(), entity) } };
-			}
-		}
-	}
-
-	return ActionResult{ true, "", { std::make_shared<MovementAction>(TimeUnit(1.0), m_actor, m_dx, m_dy, m_dz) } };
-}
-
-ActionResult MovementAction::perform()
-{
-	auto world = get_world().lock();
+	auto world = get_world();
 
 	if (!world)
 	{
@@ -46,7 +37,52 @@ ActionResult MovementAction::perform()
 		return ActionResult(false);
 	}
 
-	if (m_actor->can_fall() && !m_actor->is_on_floor())
+	if (world->in_bounds(destination()))
+	{
+		auto dest = destination();
+
+		if (world->get_tile(dest)->can_open())
+		{
+			auto open_action = std::make_unique<OpenAction>(m_actor->speed(), get_actor(), dest);
+			auto result = ActionResult{ true, "" };
+			result.add_next_action(std::move(open_action));
+			return result;
+		}
+	}
+
+	if (auto world = get_world())
+	{
+		auto blocking = world->get_blocking_entities_at(destination());
+		for (auto& entity : blocking)
+		{
+			if (entity != get_actor() && entity->is_animate() && !entity->fixed_in_place())
+			{
+				auto swap_action = std::make_unique<SwapPlacesAction>(m_actor->speed(), get_actor(), entity);
+				auto result = ActionResult{ true, "" };
+				result.add_next_action(std::move(swap_action));
+				return result;
+			}
+		}
+	}
+
+	auto movement_action = std::make_unique<MovementAction>(m_actor->speed(), m_actor, m_dx, m_dy, m_dz);
+	auto result = ActionResult{ true, "" };
+	result.add_next_action(std::move(movement_action));
+
+	return result;
+}
+
+ActionResult MovementAction::perform()
+{
+	auto world = get_world();
+
+	if (!world)
+	{
+		CERR("No world found");
+		return ActionResult(false);
+	}
+
+	if (get_action_length() > TimeUnit::from_seconds(0.0f) && m_actor->can_fall() && !m_actor->is_on_floor())
 	{
 		return ActionResult(false);
 	}

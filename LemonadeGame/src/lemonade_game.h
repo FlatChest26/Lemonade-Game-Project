@@ -25,6 +25,8 @@
 #include <vector>
 #include <functional>
 
+#include <nlohmann/json.hpp>
+
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
 

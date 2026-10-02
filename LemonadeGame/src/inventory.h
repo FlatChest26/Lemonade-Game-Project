@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef LEMONADE_GAME_SRC_INVENTORY_H
+#define LEMONADE_GAME_SRC_INVENTORY_H
+
 #include <vector>
 #include <memory>
 
@@ -8,19 +11,23 @@ class Entity;
 class Inventory
 {
 protected:
-	std::weak_ptr<Entity> m_owner{ };
-
-	std::vector<std::shared_ptr<Entity>> m_items;
+	Entity* m_owner{ };
 	size_t m_max_slots{ 1 };
 
-public:
-	Inventory(std::weak_ptr<Entity> owner = {}, std::vector<std::shared_ptr<Entity>> items = {}, size_t max_slots = 1);
+	std::vector<Entity*> m_items;
 
-	std::weak_ptr<Entity> get_owner() const { return m_owner; }
-	std::vector<std::shared_ptr<Entity>> get_items() const { return m_items; }
+public:
+	Inventory(Entity* owner = {}, size_t max_slots = 1, std::vector<Entity*> items = {});
+
+	Entity* get_owner() const { return m_owner; }
+	std::vector<Entity*> get_items() const { return m_items; }
 	size_t get_max_slots() const { return m_max_slots; }
 
-	bool add_item(std::shared_ptr<Entity> item);
-	bool remove_item(std::shared_ptr<Entity> item);
+	void set_max_slots(size_t new_max) { m_max_slots = new_max; }
+
+	bool add_item(Entity* item);
+	bool remove_item(Entity* item);
 	void clear() { m_items.clear(); }
 };
+
+#endif // !LEMONADE_GAME_SRC_INVENTORY_H

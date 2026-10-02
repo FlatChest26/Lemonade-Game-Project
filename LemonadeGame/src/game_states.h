@@ -1,36 +1,52 @@
 #pragma once
 
+#ifndef LEMONADE_GAME_SRC_GAME_STATES_H
+#define LEMONADE_GAME_SRC_GAME_STATES_H
+
 #include "lemonade_game.h"
 #include "render_params.h"
 #include "action.h"
 #include "input_handler.h"
+#include "snowy_macros.h"
+#include "renderer.h"
+
 #include <memory>
+
+class WorldGameState;
+struct GameSettings;
 
 class GameState : public std::enable_shared_from_this<GameState>
 {
 	friend class Game;
 
 protected:
-	std::weak_ptr<Game> m_game;
-	std::vector<std::shared_ptr<InputHandler>> m_input_handlers;
+	Game* m_game;
+
+	std::unique_ptr<Renderer> m_renderer;
+	std::vector<std::unique_ptr<InputHandler>> m_input_handlers;
 
 public:
+	bool is_fresh = true;
+
 	// -- Getters -- //
 
-	std::weak_ptr<Game> get_game() const { return m_game; }
+	Game* get_game() const { return m_game; }
+	GameSettings& get_game_settings() const;
 
-	std::shared_ptr<InputHandler> get_current_input_handler() const
+	Renderer* get_renderer() const { return m_renderer.get(); }
+
+	InputHandler* get_current_input_handler() const
 	{
 		if (m_input_handlers.empty())
 		{
 			return nullptr;
 		}
 
-		return m_input_handlers.back();
+		return m_input_handlers.back().get();
 	}
 
-	virtual void update() {}
-	virtual void render() const {}
+	virtual void update(double delta_time) {}
+	virtual void render() const;
 
 public:
 	// -- Input Handling -- //
@@ -41,11 +57,11 @@ public:
 		{
 			return input_handler->handle_event(event);
 		}
-		
+
 		return InputResult();
 	}
 
-	virtual void handle_action(std::shared_ptr<Action> action)
+	virtual void handle_action(std::unique_ptr<Action> action)
 	{
 		CERR("This game state does not handle actions.");
 	}
@@ -94,17 +110,17 @@ protected:
 		m_input_handlers.pop_back();
 	}
 
-	void push_input_handler(std::shared_ptr<InputHandler> input_handler)
+	void push_input_handler(InputHandler* input_handler)
 	{
 		if (!input_handler)
 			return;
 
-		m_input_handlers.push_back(input_handler);
-
-		input_handler->m_game_state = weak_from_this();
+		auto new_input_handler = std::unique_ptr<InputHandler>(input_handler);
+		m_input_handlers.emplace_back(std::move(new_input_handler));
+		m_input_handlers.back()->m_game_state = this;
 	}
 
-	void reset_input_handlers(std::shared_ptr<InputHandler> input_handler)
+	void reset_input_handlers(InputHandler* input_handler)
 	{
 		m_input_handlers.clear();
 
@@ -118,4 +134,7 @@ public:
 	// -- Checks -- //
 
 	virtual constexpr bool is_world_game_state() const { return false; }
+	virtual constexpr WorldGameState* as_world_game_state() const { return nullptr; }
 };
+
+#endif // !LEMONADE_GAME_SRC_GAME_STATES_H

@@ -7,8 +7,12 @@
 
 struct RenderParams
 {
-	std::shared_ptr<const Camera> camera { nullptr };
+	const Camera* camera{ nullptr };
 	bool use_fov = true;
+	bool show_explored_tiles = true;
+	bool render_world = true;
+	bool render_entities = true;
+	bool render_tile_map = true;
 };
 
 #endif // !LEMONADE_GAME_SRC_RENDER_PARAMS_H

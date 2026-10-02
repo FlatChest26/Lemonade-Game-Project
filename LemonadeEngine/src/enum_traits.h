@@ -50,7 +50,7 @@ struct enum_traits;
 namespace enum_traits_detail
 {
 	template<typename E>
-	using last_type = typename std::decay<decltype( enum_traits<E>::last )>::type;
+	using last_type = typename std::decay<decltype(enum_traits<E>::last)>::type;
 } // namespace enum_traits_detail
 
 template<typename E, typename U = E>
@@ -90,7 +90,7 @@ struct enum_test_result
 	bool operator!() const
 	{
 		using I = std::underlying_type_t<E>;
-		return !static_cast<I>( value );
+		return !static_cast<I>(value);
 	}
 	operator bool() const
 	{
@@ -99,36 +99,36 @@ struct enum_test_result
 };
 
 template<typename E, typename = std::enable_if_t<is_flag_enum<E>::value>>
-inline enum_test_result<E> operator&( E l, E r )
+inline enum_test_result<E> operator&(E l, E r)
 {
 	using I = std::underlying_type_t<E>;
-	return { static_cast<E>( static_cast<I>( l ) & static_cast<I>( r ) ) };
+	return { static_cast<E>(static_cast<I>(l) & static_cast<I>(r)) };
 }
 
 template<typename E, typename = std::enable_if_t<is_flag_enum<E>::value>>
-inline E operator|( E l, E r )
+inline E operator|(E l, E r)
 {
 	using I = std::underlying_type_t<E>;
-	return static_cast<E>( static_cast<I>( l ) | static_cast<I>( r ) );
+	return static_cast<E>(static_cast<I>(l) | static_cast<I>(r));
 }
 
 template<typename E, typename = std::enable_if_t<is_flag_enum<E>::value>>
-inline E& operator&=( E& l, E r )
+inline E& operator&=(E& l, E r)
 {
 	return l = l & r;
 }
 
 template<typename E, typename = std::enable_if_t<is_flag_enum<E>::value>>
-inline E& operator|=( E& l, E r )
+inline E& operator|=(E& l, E r)
 {
 	return l = l | r;
 }
 
 template<typename E, typename = std::enable_if_t<is_flag_enum<E>::value>>
-inline bool operator!( E e )
+inline bool operator!(E e)
 {
 	using I = std::underlying_type_t<E>;
-	return !static_cast<I>( e );
+	return !static_cast<I>(e);
 }
 
 #define IS_FLAG_ENUM(T)	template<> struct enum_traits<T>	{ static constexpr bool is_flag_enum = true; };

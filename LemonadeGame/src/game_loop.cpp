@@ -8,51 +8,58 @@
 #include "world_state.h"
 
 static constexpr const char* GAME_TITLE = "Lemonade Game";
-static std::shared_ptr<Game> game;
+static std::unique_ptr<Game> game;
 
 void new_game()
 {
 	// Make new game
-	game = std::make_shared<Game>();
+	game = std::make_unique<Game>();
 
-	// Make new world state and add it to the game
-	game->handle_input_result( InputResult { std::make_shared<WorldGameState>() } );
+	game->get_settings().fixed_camera = true;
+	game->get_settings().show_explored_tiles = true;
 
 	// Start new game on world state
-	auto world_state = std::dynamic_pointer_cast<WorldGameState>(game->get_current_game_state());
-	if (world_state) world_state->new_game();
+	WorldGameState* world_state = new WorldGameState();
+
+	// Make new world state and add it to the game
+	game->handle_input_result(InputResult{ world_state });
+
+	// Make new game
+	if (world_state)
+	{
+		world_state->new_game();
+	}
 }
 
 void render()
 {
-	if ( !game->should_update_screen )
+	if (!game->should_update_screen)
 	{
 		return;
 	}
-	
+
 	output::clear_console();
 
 	game->render();
 	game->should_update_screen = false;
 
 	output::present();
-	
 }
 
-void update()
+void update(double delta_time)
 {
-	game->update();
+	game->update(delta_time);
 }
 
 void handle_events()
 {
 	SDL_Event event;
 
-	while ( SDL_PollEvent( &event ) )
+	while (SDL_PollEvent(&event))
 	{
-		output::convert_event( event );
+		output::convert_event(event);
 
-		switch ( event.type )
+		switch (event.type)
 		{
 		case SDL_QUIT:
 		{
@@ -62,7 +69,7 @@ void handle_events()
 		}
 		case SDL_WINDOWEVENT:
 		{
-			if ( event.window.event == SDL_WINDOWEVENT_RESIZED )
+			if (event.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
 				output::update_window();
 			}
@@ -70,7 +77,7 @@ void handle_events()
 			game->request_screen_update();
 			if (game->get_current_game_state()->is_world_game_state())
 			{
-				auto world_state = std::dynamic_pointer_cast<WorldGameState>(game->get_current_game_state());
+				auto world_state = game->get_current_game_state()->as_world_game_state();
 				if (world_state) world_state->update_camera();
 			}
 
@@ -82,7 +89,7 @@ void handle_events()
 	}
 }
 
-#include <libtcod/timer.h>
+#include <libtcod/timer.hpp>
 
 bool run()
 {
@@ -90,30 +97,39 @@ bool run()
 
 	game->is_running = true;
 
-	while ( game->is_running )
+	//handle_events();
+	//if (game->get_current_game_state()->is_world_game_state())
+	//{
+	//	auto world_state = game->get_current_game_state()->as_world_game_state();
+	//	if (world_state) world_state->step(1.0f);
+	//}
+
+	while (game->is_running)
 	{
 		// Make sure to sync the timer to the target FPS
-		auto delta_time = timer.sync(60);
+		auto delta_time = timer.sync();
 
 		// Game loop
 
 		handle_events();
-		update();
+		update(delta_time);
 		render();
-		
+
 		// Update window title if needed
-		if ( game->should_update_window_title )
+		if (game->should_update_window_title)
 		{
-			if ( cfg::settings::SHOW_FPS ) 
+			if (cfg::settings::SHOW_FPS)
 			{
-				output::set_window_title( (std::string) GAME_TITLE + " | FPS: " + std::to_string( timer.get_mean_fps() ) );
+				output::set_window_title((std::string)GAME_TITLE + " | FPS: " + std::to_string(timer.get_mean_fps()));
 			}
 			else
 			{
-				output::set_window_title( GAME_TITLE );
+				output::set_window_title(GAME_TITLE);
 				game->should_update_window_title = false;
 			}
 		}
+
+		game->frame++;
 	}
 
 	return false;

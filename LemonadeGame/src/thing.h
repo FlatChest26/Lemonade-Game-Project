@@ -1,28 +1,30 @@
 #pragma once
 
+#ifndef LEMONADE_GAME_SRC_THING_H
+#define LEMONADE_GAME_SRC_THING_H
+
 #include "lemonade_game.h"
 #include "snowy_grammar.h"
 #include "renderable.h"
 
 using ThingID = std::string;
 
-class CreatureData;
-class Tile;
+class CreatureSoul;
+class TileType;
 
 /* An abstraction of a "thing" that can be represented in the game. A grammar object with some visual presence. */
 class Thing : public GrammarObject
 {
 public:
-	ThingID ID;
 
-	Thing( ThingID ID ): 
-		ID( ID ) 
-	{}
-
+	Thing() = default;
 	virtual ~Thing() {}
 
 public:
 	// -- Getters -- //
+
+	virtual ThingID ID() const { return "THING"; }
+	virtual std::string description() const { return std::string("This is ") + a(get_noun().singular); }
 
 	// Renderable //
 
@@ -32,22 +34,19 @@ public:
 	virtual color_t fg() const { return get_renderable().fg; }
 	virtual color_t bg() const { return get_renderable().bg; }
 
-
 	// -- Type Checks -- //
 
 	virtual constexpr bool is_creature() const { return false; }
-	virtual constexpr CreatureData* as_creature() { return nullptr; }
+	virtual constexpr CreatureSoul* as_creature() { return nullptr; }
 
-	virtual constexpr bool is_tile() const { return false; }
-	virtual constexpr Tile* as_tile() { return nullptr; }
+	virtual constexpr bool is_tile_type() const { return false; }
+	virtual constexpr TileType* as_tile_type() { return nullptr; }
 
 	// Misc //
 
-	std::string get_display_name() const { return full_name() + " " + char(glyph()); }
-	operator std::string() const { return get_display_name(); }
-
+	virtual std::string get_display_name() const { return full_name() + " " + char(glyph()); }
+	virtual operator std::string() const { return get_display_name(); }
 };
-
 
 inline std::ostream& operator<<(std::ostream& os, const Thing& thing)
 {
@@ -72,7 +71,6 @@ namespace std
 	}
 }
 
-
 namespace fmt
 {
 	template <typename T>
@@ -84,3 +82,5 @@ namespace fmt
 		}
 	};
 }
+
+#endif // !LEMONADE_GAME_SRC_THING_H

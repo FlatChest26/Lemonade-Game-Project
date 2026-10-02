@@ -1,15 +1,20 @@
 #pragma once
 
-#include <SDL_events.h>
-#include <memory>
+#ifndef LEMONADE_GAME_SRC_INPUT_HANDLER_H
+#define LEMONADE_GAME_SRC_INPUT_HANDLER_H
 
-#include "snowy_macros.h"
+#include <SDL_events.h>
 
 #define DEF_HANDLER_EVENT(x) virtual InputResult ev_##x( SDL_Event event )
 #define OVERRIDE_HANDLER_EVENT(x) virtual InputResult ev_##x( SDL_Event event ) override
 
 class InputHandler;
 class GameState;
+class WorldGameState;
+class Game;
+class Camera;
+class World;
+class Entity;
 
 struct InputResult
 {
@@ -27,32 +32,38 @@ struct InputResult
 
 	Type type{ Type::None };
 
-	std::shared_ptr<GameState> next_game_state{ nullptr };
-	std::shared_ptr<InputHandler> next_input_handler{ nullptr };
+	GameState* next_game_state{ nullptr };
+	InputHandler* next_input_handler{ nullptr };
 
 	InputResult() :
 		type(Type::None), next_game_state(nullptr), next_input_handler(nullptr)
-	{}
+	{
+	}
 
-	InputResult(Type type, std::shared_ptr<GameState> game_state) :
+	InputResult(Type type, GameState* game_state) :
 		type(type), next_game_state(game_state)
-	{}
+	{
+	}
 
-	InputResult(Type type, std::shared_ptr<InputHandler> input_handler) :
+	InputResult(Type type, InputHandler* input_handler) :
 		type(type), next_input_handler(input_handler)
-	{}
+	{
+	}
 
 	InputResult(Type type) :
 		type(type), next_game_state(nullptr), next_input_handler(nullptr)
-	{}
+	{
+	}
 
-	InputResult(std::shared_ptr<GameState> game_state) :
+	InputResult(GameState* game_state) :
 		type(Type::Push_GameState), next_game_state(game_state), next_input_handler(nullptr)
-	{}
+	{
+	}
 
-	InputResult(std::shared_ptr<InputHandler> input_handler) :
+	InputResult(InputHandler* input_handler) :
 		type(Type::Push_InputHandler), next_input_handler(input_handler)
-	{}
+	{
+	}
 };
 
 class InputHandler
@@ -60,10 +71,9 @@ class InputHandler
 	friend class GameState;
 
 protected:
-	std::weak_ptr<GameState> m_game_state;
+	GameState* m_game_state{ nullptr };
 	bool m_allow_input_pass_through{ false };
 
-protected:
 	InputResult dispatch(SDL_Event event)
 	{
 		switch (event.type)
@@ -98,26 +108,26 @@ protected:
 
 public:
 
-	InputHandler() :
-		m_game_state()
-	{}
-
+	InputHandler(GameState* game_state = nullptr);
 
 public:
 
 	// -- Getters & Setters -- //
 
-	std::weak_ptr<GameState> get_game_state() { return m_game_state; }
-	void set_game_state(std::weak_ptr<GameState> game_state) { m_game_state = game_state; }
+	Game* get_game();
 
+	GameState* get_game_state();
+	WorldGameState* get_world_state();
+	Entity* get_player();
+	World* get_world();
+	Camera* get_camera();
+
+	void set_allow_input_pass_through(bool allow) { m_allow_input_pass_through = allow; }
 	bool allow_input_pass_through() const { return m_allow_input_pass_through; }
 
 	// -- Utilities -- //
 
-	virtual InputResult handle_event(SDL_Event event)
-	{
-		return dispatch(event);
-	}
+	virtual InputResult handle_event(SDL_Event event) { return dispatch(event); }
 
 protected:
 	DEF_HANDLER_EVENT(quit) { return InputResult(); }
@@ -134,3 +144,5 @@ protected:
 	DEF_HANDLER_EVENT(mouse_button_up) { return InputResult(); }
 	DEF_HANDLER_EVENT(mouse_wheel) { return InputResult(); }
 };
+
+#endif // !LEMONADE_GAME_SRC_INPUT_HANDLER_H

@@ -13,6 +13,306 @@
 #include "enum_traits.h"
 
 template<typename T>
+struct Vec2D
+{
+	using _Num_Type = T;
+	using TupleVec2D = std::tuple<_Num_Type, _Num_Type>;
+	using Vec2DType = Vec2D<_Num_Type>;
+
+public:
+	// -- Variables -- //
+
+	_Num_Type x{ 0 }, y{ 0 };
+
+public:
+	// -- Constructors -- //
+
+	constexpr Vec2D() :
+		x(static_cast<_Num_Type>(0)), y(static_cast<_Num_Type>(0))
+	{
+	}
+
+	constexpr Vec2D(const _Num_Type& x, const _Num_Type& y) :
+		x(x), y(y)
+	{
+	}
+
+	constexpr Vec2D(const TupleVec2D& vec2d) :
+		Vec2D(std::get<0>(vec2d), std::get<1>(vec2d))
+	{
+	}
+
+	constexpr Vec2D(const _Num_Type& u) :
+		x(u), y(u)
+	{
+	}
+
+	constexpr Vec2D(const Vec2DType& other) :
+		x(other.x), y(other.y)
+	{
+	}
+
+	constexpr Vec2D(Vec2DType&& other) noexcept :
+		x(other.x), y(other.y)
+	{
+	}
+public:
+	// -- Getters -- //
+
+	constexpr TupleVec2D as_tuple() const
+	{
+		return TupleVec2D(x, y);
+	}
+
+public:
+	// Casts //
+
+	constexpr operator TupleVec2D() const
+	{
+		return as_tuple();
+	}
+
+	constexpr operator Vec2D<int32_t>() const
+	{
+		return { static_cast<int32_t>(x), static_cast<int32_t>(y) };
+	}
+	constexpr operator Vec2D<uint32_t>() const
+	{
+		return { static_cast<uint32_t>(x), static_cast<uint32_t>(y) };
+	}
+
+public:
+	// Equality //
+
+	constexpr bool operator==(const Vec2DType& other) const
+	{
+		return x == other.x && y == other.y;
+	}
+
+public:
+	// Not Equals //
+
+	constexpr bool operator!=(const Vec2DType& other) const
+	{
+		return x != other.x && y != other.y;
+	}
+
+public:
+	// Equals Assignment //
+
+	constexpr Vec2DType& operator=(const Vec2DType& other)
+	{
+		x = other.x; y = other.y;
+		return *this;
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T>& operator=(const U& other)
+	{
+		x = static_cast<T>(other);
+		y = static_cast<T>(other);
+
+		return *this;
+	}
+
+public:
+	// Addition //
+
+	constexpr Vec2DType operator+(const Vec2DType& other)
+	{
+		return  { x + other.x, y + other.y };
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T> operator+(const U& other)
+	{
+		return  { x + static_cast<T>(other), y + static_cast<T>(other) };
+	}
+
+public:
+	// Addition Assignment //
+
+	constexpr Vec2DType& operator+=(const Vec2DType& other)
+	{
+		x += other.x; y += other.y;
+		return *this;
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T>& operator+=(const U& other)
+	{
+		x += static_cast<T>(other);
+		y += static_cast<T>(other);
+
+		return *this;
+	}
+
+public:
+	// Subtraction //
+
+	constexpr Vec2DType operator-(const Vec2DType& other)
+	{
+		return  { x - other.x, y - other.y };
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T> operator-(const U& other)
+	{
+		return  { x - static_cast<T>(other), y - static_cast<T>(other) };
+	}
+
+public:
+	// Subtraction Assignment //
+
+	constexpr Vec2DType& operator-=(const Vec2DType& other)
+	{
+		x -= other.x; y -= other.y;
+		return *this;
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T>& operator-=(const U& other)
+	{
+		x -= static_cast<T>(other);
+		y -= static_cast<T>(other);
+
+		return *this;
+	}
+
+public:
+	// Multiplication //
+
+	constexpr Vec2DType operator*(const Vec2DType& other)
+	{
+		return  { x * other.x, y * other.y };
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T> operator*(const U& other)
+	{
+		return  { x * static_cast<T>(other), y * static_cast<T>(other) };
+	}
+
+public:
+	// Multiplication Assignment //
+
+	constexpr Vec2DType& operator*=(const Vec2DType& other)
+	{
+		x *= other.x; y *= other.y;
+		return *this;
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T>& operator*=(const U& other)
+	{
+		x *= static_cast<T>(other);
+		y *= static_cast<T>(other);
+
+		return *this;
+	}
+
+public:
+	// Division / //
+
+	constexpr Vec2DType operator/(const Vec2DType& other)
+	{
+		return  { x / other.x, y / other.y };
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T> operator/(const U& other)
+	{
+		return  { x / static_cast<T>(other), y / static_cast<T>(other) };
+	}
+
+public:
+	// Division Assignment /= //
+
+	constexpr Vec2DType& operator/=(const Vec2DType& other)
+	{
+		x /= other.x; y /= other.y;
+		return *this;
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T>& operator/=(const U& other)
+	{
+		x /= static_cast<T>(other);
+		y /= static_cast<T>(other);
+
+		return *this;
+	}
+
+public:
+	// Modulus % //
+
+	constexpr Vec2DType operator%(const Vec2DType& other)
+	{
+		return  { x % other.x, y % other.y };
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T> operator%(const U& other)
+	{
+		return  { x % static_cast<T>(other), y % static_cast<T>(other) };
+	}
+
+public:
+	// Modulus Assignment %= //
+
+	constexpr Vec2DType& operator%=(const Vec2DType& other)
+	{
+		x %= other.x; y %= other.y;
+		return *this;
+	}
+
+	template<typename T, typename U>
+	constexpr Vec2D<T>& operator%=(const U& other)
+	{
+		x %= static_cast<T>(other);
+		y %= static_cast<T>(other);
+
+		return *this;
+	}
+
+public:
+	// Comparison //
+
+	constexpr bool operator<(const Vec2DType& other)
+	{
+		return  x < other.x && y < other.y;
+	}
+
+	constexpr bool operator<=(const Vec2DType& other)
+	{
+		return x <= other.x && y <= other.y;
+	}
+
+	constexpr bool operator>(const Vec2DType& other)
+	{
+		return  x > other.x && y > other.y;
+	}
+
+	constexpr bool operator>=(const Vec2DType& other)
+	{
+		return x >= other.x && y >= other.y;
+	}
+};
+
+template <typename VEC_TYPE = int32_t>
+inline float vec2d_length(const Vec2D<VEC_TYPE>& vec2d, bool squared = false)
+{
+	if (squared)
+	{
+		return std::fabs(static_cast<float>(vec2d.x * vec2d.x) + static_cast<float>(vec2d.y * vec2d.y));
+	}
+	else
+	{
+		return std::fabs(std::sqrtf(static_cast<float>(vec2d.x * vec2d.x) + static_cast<float>(vec2d.y * vec2d.y)));
+	}
+}
+
+template<typename T>
 struct Vec3D
 {
 	using _Num_Type = T;
@@ -23,44 +323,50 @@ struct Vec3D
 public:
 	// -- Variables -- //
 
-	_Num_Type x { 0 }, y { 0 }, z { 0 };
+	_Num_Type x{ 0 }, y{ 0 }, z{ 0 };
 
 public:
 	// -- Constructors -- //
 
-	constexpr Vec3D():
-		x( static_cast<_Num_Type>( 0 ) ), y( static_cast<_Num_Type>( 0 ) ), z( static_cast<_Num_Type>( 0 ) )
-	{}
+	constexpr Vec3D() :
+		x(static_cast<_Num_Type>(0)), y(static_cast<_Num_Type>(0)), z(static_cast<_Num_Type>(0))
+	{
+	}
 
-	constexpr Vec3D( const _Num_Type& x, const _Num_Type& y, const _Num_Type& z ) :
-		x( x ), y( y ), z( z )
-	{}
+	constexpr Vec3D(const _Num_Type& x, const _Num_Type& y, const _Num_Type& z) :
+		x(x), y(y), z(z)
+	{
+	}
 
-	constexpr Vec3D( const TupleVec3D& vec3d ) :
-		Vec3D( std::get<0>( vec3d ), std::get<1>( vec3d ), std::get<2>( vec3d ) )
-	{}
+	constexpr Vec3D(const TupleVec3D& vec3d) :
+		Vec3D(std::get<0>(vec3d), std::get<1>(vec3d), std::get<2>(vec3d))
+	{
+	}
 
-	constexpr Vec3D( const _Num_Type& u ) :
-		x( u ), y( u ), z( u )
-	{}
+	constexpr Vec3D(const _Num_Type& u) :
+		x(u), y(u), z(u)
+	{
+	}
 
-	constexpr Vec3D( const Vec3DType& other ) :
-		x( other.x ), y( other.y ), z( other.z )
-	{}
+	constexpr Vec3D(const Vec3DType& other) :
+		x(other.x), y(other.y), z(other.z)
+	{
+	}
 
-	constexpr Vec3D( Vec3DType&& other ) noexcept:
-		x( other.x ), y( other.y ), z( other.z )
-	{}
+	constexpr Vec3D(Vec3DType&& other) noexcept :
+		x(other.x), y(other.y), z(other.z)
+	{
+	}
 public:
 	// -- Getters -- //
 
 	constexpr TupleVec3D as_tuple() const
 	{
-		return TupleVec3D( x, y, z );
+		return TupleVec3D(x, y, z);
 	}
 	constexpr TupleVec2D as_2d_tuple() const
 	{
-		return TupleVec2D( x, y );
+		return TupleVec2D(x, y);
 	}
 
 public:
@@ -76,17 +382,17 @@ public:
 	}
 	constexpr operator Vec3D<int32_t>() const
 	{
-		return { static_cast<int32_t>( x ), static_cast<int32_t>( y ), static_cast<int32_t>( z ) };
+		return { static_cast<int32_t>(x), static_cast<int32_t>(y), static_cast<int32_t>(z) };
 	}
 	constexpr operator Vec3D<uint32_t>() const
 	{
-		return { static_cast<uint32_t>( x ), static_cast<uint32_t>( y ), static_cast<uint32_t>( z ) };
+		return { static_cast<uint32_t>(x), static_cast<uint32_t>(y), static_cast<uint32_t>(z) };
 	}
 
 public:
 	// Equality //
 
-	constexpr bool operator==( const Vec3DType& other ) const
+	constexpr bool operator==(const Vec3DType& other) const
 	{
 		return x == other.x && y == other.y && z == other.z;
 	}
@@ -94,7 +400,7 @@ public:
 public:
 	// Not Equals //
 
-	constexpr bool operator!=( const Vec3DType& other ) const
+	constexpr bool operator!=(const Vec3DType& other) const
 	{
 		return x != other.x && y != other.y && z != other.z;
 	}
@@ -102,18 +408,18 @@ public:
 public:
 	// Equals Assignment //
 
-	constexpr Vec3DType& operator=( const Vec3DType& other )
+	constexpr Vec3DType& operator=(const Vec3DType& other)
 	{
 		x = other.x; y = other.y; z = other.z;
 		return *this;
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T>& operator=( const U& other )
+	constexpr Vec3D<T>& operator=(const U& other)
 	{
-		x = static_cast<T>( other );
-		y = static_cast<T>( other );
-		z = static_cast<T>( other );
+		x = static_cast<T>(other);
+		y = static_cast<T>(other);
+		z = static_cast<T>(other);
 
 		return *this;
 	}
@@ -121,32 +427,32 @@ public:
 public:
 	// Addition //
 
-	constexpr Vec3DType operator+( const Vec3DType& other )
+	constexpr Vec3DType operator+(const Vec3DType& other)
 	{
 		return  { x + other.x, y + other.y, z + other.z };
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T> operator+( const U& other )
+	constexpr Vec3D<T> operator+(const U& other)
 	{
-		return  { x + static_cast<T>( other ), y + static_cast<T>( other ), z + static_cast<T>( other ) };
+		return  { x + static_cast<T>(other), y + static_cast<T>(other), z + static_cast<T>(other) };
 	}
 
 public:
 	// Addition Assignment //
 
-	constexpr Vec3DType& operator+=( const Vec3DType& other )
+	constexpr Vec3DType& operator+=(const Vec3DType& other)
 	{
 		x += other.x; y += other.y; z += other.z;
 		return *this;
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T>& operator+=( const U& other )
+	constexpr Vec3D<T>& operator+=(const U& other)
 	{
-		x += static_cast<T>( other );
-		y += static_cast<T>( other );
-		z += static_cast<T>( other );
+		x += static_cast<T>(other);
+		y += static_cast<T>(other);
+		z += static_cast<T>(other);
 
 		return *this;
 	}
@@ -154,32 +460,32 @@ public:
 public:
 	// Subtraction //
 
-	constexpr Vec3DType operator-( const Vec3DType& other )
+	constexpr Vec3DType operator-(const Vec3DType& other)
 	{
 		return  { x - other.x, y - other.y, z - other.z };
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T> operator-( const U& other )
+	constexpr Vec3D<T> operator-(const U& other)
 	{
-		return  { x - static_cast<T>( other ), y - static_cast<T>( other ), z - static_cast<T>( other ) };
+		return  { x - static_cast<T>(other), y - static_cast<T>(other), z - static_cast<T>(other) };
 	}
 
 public:
 	// Subtraction Assignment //
 
-	constexpr Vec3DType& operator-=( const Vec3DType& other )
+	constexpr Vec3DType& operator-=(const Vec3DType& other)
 	{
 		x -= other.x; y -= other.y; z -= other.z;
 		return *this;
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T>& operator-=( const U& other )
+	constexpr Vec3D<T>& operator-=(const U& other)
 	{
-		x -= static_cast<T>( other );
-		y -= static_cast<T>( other );
-		z -= static_cast<T>( other );
+		x -= static_cast<T>(other);
+		y -= static_cast<T>(other);
+		z -= static_cast<T>(other);
 
 		return *this;
 	}
@@ -187,32 +493,32 @@ public:
 public:
 	// Multiplication //
 
-	constexpr Vec3DType operator*( const Vec3DType& other )
+	constexpr Vec3DType operator*(const Vec3DType& other)
 	{
 		return  { x * other.x, y * other.y, z * other.z };
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T> operator*( const U& other )
+	constexpr Vec3D<T> operator*(const U& other)
 	{
-		return  { x * static_cast<T>( other ), y * static_cast<T>( other ), z * static_cast<T>( other ) };
+		return  { x * static_cast<T>(other), y * static_cast<T>(other), z * static_cast<T>(other) };
 	}
 
 public:
 	// Multiplication Assignment //
 
-	constexpr Vec3DType& operator*=( const Vec3DType& other )
+	constexpr Vec3DType& operator*=(const Vec3DType& other)
 	{
 		x *= other.x; y *= other.y; z *= other.z;
 		return *this;
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T>& operator*=( const U& other )
+	constexpr Vec3D<T>& operator*=(const U& other)
 	{
-		x *= static_cast<T>( other );
-		y *= static_cast<T>( other );
-		z *= static_cast<T>( other );
+		x *= static_cast<T>(other);
+		y *= static_cast<T>(other);
+		z *= static_cast<T>(other);
 
 		return *this;
 	}
@@ -220,32 +526,32 @@ public:
 public:
 	// Division / //
 
-	constexpr Vec3DType operator/( const Vec3DType& other )
+	constexpr Vec3DType operator/(const Vec3DType& other)
 	{
 		return  { x / other.x, y / other.y, z / other.z };
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T> operator/( const U& other )
+	constexpr Vec3D<T> operator/(const U& other)
 	{
-		return  { x / static_cast<T>( other ), y / static_cast<T>( other ), z / static_cast<T>( other ) };
+		return  { x / static_cast<T>(other), y / static_cast<T>(other), z / static_cast<T>(other) };
 	}
 
 public:
 	// Division Assignment /= //
 
-	constexpr Vec3DType& operator/=( const Vec3DType& other )
+	constexpr Vec3DType& operator/=(const Vec3DType& other)
 	{
 		x /= other.x; y /= other.y; z /= other.z;
 		return *this;
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T>& operator/=( const U& other )
+	constexpr Vec3D<T>& operator/=(const U& other)
 	{
-		x /= static_cast<T>( other );
-		y /= static_cast<T>( other );
-		z /= static_cast<T>( other );
+		x /= static_cast<T>(other);
+		y /= static_cast<T>(other);
+		z /= static_cast<T>(other);
 
 		return *this;
 	}
@@ -253,32 +559,32 @@ public:
 public:
 	// Modulus % //
 
-	constexpr Vec3DType operator%( const Vec3DType& other )
+	constexpr Vec3DType operator%(const Vec3DType& other)
 	{
 		return  { x % other.x, y % other.y, z % other.z };
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T> operator%( const U& other )
+	constexpr Vec3D<T> operator%(const U& other)
 	{
-		return  { x % static_cast<T>( other ), y % static_cast<T>( other ), z % static_cast<T>( other ) };
+		return  { x % static_cast<T>(other), y % static_cast<T>(other), z % static_cast<T>(other) };
 	}
 
 public:
 	// Modulus Assignment %= //
 
-	constexpr Vec3DType& operator%=( const Vec3DType& other )
+	constexpr Vec3DType& operator%=(const Vec3DType& other)
 	{
 		x %= other.x; y %= other.y; z %= other.z;
 		return *this;
 	}
 
 	template<typename T, typename U>
-	constexpr Vec3D<T>& operator%=( const U& other )
+	constexpr Vec3D<T>& operator%=(const U& other)
 	{
-		x %= static_cast<T>( other );
-		y %= static_cast<T>( other );
-		z %= static_cast<T>( other );
+		x %= static_cast<T>(other);
+		y %= static_cast<T>(other);
+		z %= static_cast<T>(other);
 
 		return *this;
 	}
@@ -286,75 +592,82 @@ public:
 public:
 	// Comparison //
 
-	constexpr bool operator<( const Vec3DType& other )
+	constexpr bool operator<(const Vec3DType& other)
 	{
 		return  x < other.x && y < other.y && z < other.z;
 	}
 
-	constexpr bool operator<=( const Vec3DType& other )
+	constexpr bool operator<=(const Vec3DType& other)
 	{
 		return x <= other.x && y <= other.y && z <= other.z;
 	}
 
-	constexpr bool operator>( const Vec3DType& other )
+	constexpr bool operator>(const Vec3DType& other)
 	{
 		return  x > other.x && y > other.y && z > other.z;
 	}
 
-	constexpr bool operator>=( const Vec3DType& other )
+	constexpr bool operator>=(const Vec3DType& other)
 	{
 		return x >= other.x && y >= other.y && z >= other.z;
 	}
 };
 
 template <typename VEC_TYPE = int32_t>
-inline float vec3d_length( const Vec3D<VEC_TYPE>& vec3d, bool squared = false )
+inline float vec3d_length(const Vec3D<VEC_TYPE>& vec3d, bool squared = false)
 {
-	if ( squared )
+	if (squared)
 	{
-		return std::fabs( static_cast<float>( vec3d.x * vec3d.x ) + static_cast<float>( vec3d.y * vec3d.y ) + static_cast<float>( vec3d.z * vec3d.z ) );
+		return std::fabs(static_cast<float>(vec3d.x * vec3d.x) + static_cast<float>(vec3d.y * vec3d.y) + static_cast<float>(vec3d.z * vec3d.z));
 	}
 	else
 	{
-		return std::fabs( std::sqrtf( static_cast<float>( vec3d.x * vec3d.x ) + static_cast<float>( vec3d.y * vec3d.y ) + static_cast<float>( vec3d.z * vec3d.z ) ) );
+		return std::fabs(std::sqrtf(static_cast<float>(vec3d.x * vec3d.x) + static_cast<float>(vec3d.y * vec3d.y) + static_cast<float>(vec3d.z * vec3d.z)));
 	}
 }
 
 // Absolute coordinate. 1 Coord = 1/24 ChunkCoord.
 using Coord = int32_t;
-// Absolute position. 1 Position = 1/24 ChunkPosition.
+using CoordF = double;
+
 using Position = Vec3D<Coord>;
+using PositionD = Vec3D<CoordF>;
 using TuplePosition = std::tuple<Coord, Coord, Coord>;
+using TuplePositionF = std::tuple<CoordF, CoordF, CoordF>;
 
 using Length = uint32_t;
+using LengthF = double;
+
 using Size = Vec3D<Length>;
+using SizeF = Vec3D<LengthF>;
 using TupleSize = std::tuple<Length, Length, Length>;
+using TupleSizeF = std::tuple<LengthF, LengthF, LengthF>;
 
 namespace std
 {
 	template <typename VEC_TYPE = int32_t>
-	inline string to_string( const Vec3D<VEC_TYPE>& vec3d )
+	inline string to_string(const Vec3D<VEC_TYPE>& vec3d)
 	{
-		return "(" + to_string( vec3d.x ) + ", " + to_string( vec3d.y ) + ", " + to_string( vec3d.z ) + ")";
+		return "(" + to_string(vec3d.x) + ", " + to_string(vec3d.y) + ", " + to_string(vec3d.z) + ")";
 	}
 
 	template <typename VEC_TYPE = int32_t>
-	inline wstring to_wstring( const Vec3D<VEC_TYPE>& vec3d )
+	inline wstring to_wstring(const Vec3D<VEC_TYPE>& vec3d)
 	{
-		return "(" + to_wstring( vec3d.x ) + ", " + to_wstring( vec3d.y ) + ", " + to_wstring( vec3d.z ) + ")";
+		return "(" + to_wstring(vec3d.x) + ", " + to_wstring(vec3d.y) + ", " + to_wstring(vec3d.z) + ")";
 	}
 }
 
 template <typename VEC_TYPE = int32_t>
-inline std::ostream& operator<<( std::ostream& os, const Vec3D<VEC_TYPE>& vec3d )
+inline std::ostream& operator<<(std::ostream& os, const Vec3D<VEC_TYPE>& vec3d)
 {
-	return os << std::to_string<VEC_TYPE>( vec3d );
+	return os << std::to_string<VEC_TYPE>(vec3d);
 }
 
 template <typename VEC_TYPE = int32_t>
-inline std::wostream& operator<<( std::wostream& os, const Vec3D<VEC_TYPE>& vec3d )
+inline std::wostream& operator<<(std::wostream& os, const Vec3D<VEC_TYPE>& vec3d)
 {
-	return os << std::to_wstring<VEC_TYPE>( vec3d );
+	return os << std::to_wstring<VEC_TYPE>(vec3d);
 };
 
 enum Direction : uint8_t
@@ -397,105 +710,111 @@ enum Direction : uint8_t
 	WEST_BELOW = WEST | BELOW,
 };
 
-IS_FLAG_ENUM( Direction )
+IS_FLAG_ENUM(Direction)
 
 namespace transforms
 {
-	inline constexpr Position dir_as_pos( const Direction& dir )
+	inline constexpr Position dir_as_pos(const Direction& dir)
 	{
-		return Position {
-			( dir & WEST ) ? -1  : ( dir & EAST ) ? 1  : 0,
-			( dir & NORTH ) ? -1 : ( dir & SOUTH ) ? 1 : 0,
-			( dir & BELOW ) ? -1 : ( dir & ABOVE ) ? 1 : 0
+		return Position{
+			(dir & WEST) ? -1 : (dir & EAST) ? 1 : 0,
+			(dir & NORTH) ? -1 : (dir & SOUTH) ? 1 : 0,
+			(dir & BELOW) ? -1 : (dir & ABOVE) ? 1 : 0
 		};
 	}
 
-	inline constexpr Direction pos_as_dir( const Position& pos )
+	inline constexpr Direction pos_as_dir(const Position& pos)
 	{
-		return Direction {
-			( pos.x < 0 ) ? WEST  : ( pos.x > 0 ) ? EAST  : NO_DIRECTION |
-			( pos.y < 0 ) ? NORTH : ( pos.y > 0 ) ? SOUTH : NO_DIRECTION |
-			( pos.z < 0 ) ? BELOW : ( pos.z > 0 ) ? ABOVE : NO_DIRECTION
+		return Direction{
+			(pos.x < 0) ? WEST : (pos.x > 0) ? EAST : NO_DIRECTION |
+			(pos.y < 0) ? NORTH : (pos.y > 0) ? SOUTH : NO_DIRECTION |
+			(pos.z < 0) ? BELOW : (pos.z > 0) ? ABOVE : NO_DIRECTION
 		};
 	}
 
-	inline constexpr Direction pos_as_dir( const Coord& x, const Coord& y, const Coord& z )
+	inline constexpr Direction pos_as_dir(const Coord& x, const Coord& y, const Coord& z)
 	{
-		return pos_as_dir( Position( x, y, z ) );
+		return pos_as_dir(Position(x, y, z));
 	}
-
-	inline constexpr Direction a = pos_as_dir( 1, 0, -1 );
 }
 
 namespace std
 {
-	inline string to_string( Direction dir )
+	inline string to_string(Direction dir)
 	{
 		return
-			string( dir & Direction::NORTH ? "north " : "" ) +
-			string( dir & Direction::SOUTH ? "south " : "" ) +
-			string( dir & Direction::WEST  ? "west " : "" ) +
-			string( dir & Direction::EAST  ? "east " : "" ) +
-			string( dir & Direction::ABOVE ? "above" : "" ) +
-			string( dir & Direction::BELOW ? "below" : "" );
+			string(dir & Direction::NORTH ? "north " : "") +
+			string(dir & Direction::SOUTH ? "south " : "") +
+			string(dir & Direction::WEST ? "west " : "") +
+			string(dir & Direction::EAST ? "east " : "") +
+			string(dir & Direction::ABOVE ? "above" : "") +
+			string(dir & Direction::BELOW ? "below" : "");
 	}
 
-	inline ostream& operator<<( ostream& os, Direction dir )
+	inline ostream& operator<<(ostream& os, Direction dir)
 	{
-		return os << to_string( dir );
+		return os << to_string(dir);
 	}
 }
 
-inline constexpr Position DEFAULT_POSITION = Position { 0, 0, 0 };
-inline constexpr Size DEFAULT_SIZE = Size { 1, 1, 1 };
+inline constexpr Position DEFAULT_POSITION = Position{ 0, 0, 0 };
+inline constexpr Size DEFAULT_SIZE = Size{ 1, 1, 1 };
 inline constexpr Direction DEFAULT_DIRECTION = NO_DIRECTION;
 
 struct Transform
 {
 public:
 	// -- Variables -- //
-	Position position { DEFAULT_POSITION };
-	Size size { DEFAULT_SIZE };
-	Direction direction { DEFAULT_DIRECTION };
+	Position position{ DEFAULT_POSITION };
+	Size size{ DEFAULT_SIZE };
+	Direction direction{ DEFAULT_DIRECTION };
 
-	constexpr Transform():
-		position( DEFAULT_POSITION ), size( DEFAULT_SIZE ), direction( DEFAULT_DIRECTION )
-	{}
+	constexpr Transform() :
+		position(DEFAULT_POSITION), size(DEFAULT_SIZE), direction(DEFAULT_DIRECTION)
+	{
+	}
 
-	constexpr Transform( const Position& position, const Size& size, const Direction& direction ) :
-		position( position ), size( size ), direction( direction )
-	{}
+	constexpr Transform(const Position& position, const Size& size, const Direction& direction) :
+		position(position), size(size), direction(direction)
+	{
+	}
 
-	constexpr Transform( const Position& position, const Size& size ) :
-		Transform( position, size, DEFAULT_DIRECTION )
-	{}
+	constexpr Transform(const Position& position, const Size& size) :
+		Transform(position, size, DEFAULT_DIRECTION)
+	{
+	}
 
-	constexpr Transform( const Position& position, const Direction& direction ) :
-		Transform( position, DEFAULT_SIZE, direction )
-	{}
+	constexpr Transform(const Position& position, const Direction& direction) :
+		Transform(position, DEFAULT_SIZE, direction)
+	{
+	}
 
-	constexpr Transform( const Size& size, const Direction& direction ) :
-		Transform( DEFAULT_POSITION, size, direction )
-	{}
+	constexpr Transform(const Size& size, const Direction& direction) :
+		Transform(DEFAULT_POSITION, size, direction)
+	{
+	}
 
-	constexpr Transform( const Position& position ) :
-		Transform( position, DEFAULT_SIZE, DEFAULT_DIRECTION )
-	{}
+	constexpr Transform(const Position& position) :
+		Transform(position, DEFAULT_SIZE, DEFAULT_DIRECTION)
+	{
+	}
 
-	constexpr Transform( const Size& size ) :
-		Transform( DEFAULT_POSITION, size, DEFAULT_DIRECTION )
-	{}
+	constexpr Transform(const Size& size) :
+		Transform(DEFAULT_POSITION, size, DEFAULT_DIRECTION)
+	{
+	}
 
-	constexpr Transform( const Direction& direction ) :
-		Transform( DEFAULT_POSITION, DEFAULT_SIZE, direction )
-	{}
+	constexpr Transform(const Direction& direction) :
+		Transform(DEFAULT_POSITION, DEFAULT_SIZE, direction)
+	{
+	}
 
-	constexpr bool operator==( const Transform& other ) const
+	constexpr bool operator==(const Transform& other) const
 	{
 		return position == other.position && size == other.size && direction == other.direction;
 	}
 
-	constexpr Transform& operator=( const Transform& other )
+	constexpr Transform& operator=(const Transform& other)
 	{
 		position = other.position;
 		size = other.size;
@@ -507,102 +826,102 @@ public:
 
 namespace transforms
 {
-	inline constexpr  std::vector<Position> get_surrounding_directions( bool include_z = false )
+	inline constexpr  std::vector<Position> get_surrounding_directions(bool include_z = false)
 	{
-		if ( include_z )
+		if (include_z)
 		{
 			return std::vector<Position>
 			{
-				Position( 1, 0, -1 ),
-					Position( 1, 1, -1 ),
-					Position( 0, 1, -1 ),
-					Position( -1, 1, -1 ),
-					Position( -1, 0, -1 ),
-					Position( -1, -1, -1 ),
-					Position( 0, -1, -1 ),
-					Position( 1, -1, -1 ),
+				Position(1, 0, -1),
+					Position(1, 1, -1),
+					Position(0, 1, -1),
+					Position(-1, 1, -1),
+					Position(-1, 0, -1),
+					Position(-1, -1, -1),
+					Position(0, -1, -1),
+					Position(1, -1, -1),
 
-					Position( 1, 0, 0 ),
-					Position( 1, 1, 0 ),
-					Position( 0, 1, 0 ),
-					Position( -1, 1, 0 ),
-					Position( -1, 0, 0 ),
-					Position( -1, -1, 0 ),
-					Position( 0, -1, 0 ),
-					Position( 1, -1, 0 ),
+					Position(1, 0, 0),
+					Position(1, 1, 0),
+					Position(0, 1, 0),
+					Position(-1, 1, 0),
+					Position(-1, 0, 0),
+					Position(-1, -1, 0),
+					Position(0, -1, 0),
+					Position(1, -1, 0),
 
-					Position( 1, 0, 1 ),
-					Position( 1, 1, 1 ),
-					Position( 0, 1, 1 ),
-					Position( -1, 1, 1 ),
-					Position( -1, 0, 1 ),
-					Position( -1, -1, 1 ),
-					Position( 0, -1, 1 ),
-					Position( 1, -1, 1 )
+					Position(1, 0, 1),
+					Position(1, 1, 1),
+					Position(0, 1, 1),
+					Position(-1, 1, 1),
+					Position(-1, 0, 1),
+					Position(-1, -1, 1),
+					Position(0, -1, 1),
+					Position(1, -1, 1)
 			};
 		}
 		else
 		{
 			return std::vector<Position>
 			{
-				Position( 1, 0, 0 ),
-					Position( 1, 1, 0 ),
-					Position( 0, 1, 0 ),
-					Position( -1, 1, 0 ),
-					Position( -1, 0, 0 ),
-					Position( -1, -1, 0 ),
-					Position( 0, -1, 0 ),
-					Position( 1, -1, 0 )
+				Position(1, 0, 0),
+					Position(1, 1, 0),
+					Position(0, 1, 0),
+					Position(-1, 1, 0),
+					Position(-1, 0, 0),
+					Position(-1, -1, 0),
+					Position(0, -1, 0),
+					Position(1, -1, 0)
 			};
 		}
 	}
 
-	inline constexpr std::vector<Position> get_surrounding_locations( Position origin, bool include_z = false )
+	inline constexpr std::vector<Position> get_surrounding_locations(Position origin, bool include_z = false)
 	{
-		if ( include_z )
+		if (include_z)
 		{
 			return std::vector<Position>
 			{
-				origin + Position( 1, 0, -1 ),
-					origin + Position( 1, 1, -1 ),
-					origin + Position( 0, 1, -1 ),
-					origin + Position( -1, 1, -1 ),
-					origin + Position( -1, 0, -1 ),
-					origin + Position( -1, -1, -1 ),
-					origin + Position( 0, -1, -1 ),
-					origin + Position( 1, -1, -1 ),
+				origin + Position(1, 0, -1),
+					origin + Position(1, 1, -1),
+					origin + Position(0, 1, -1),
+					origin + Position(-1, 1, -1),
+					origin + Position(-1, 0, -1),
+					origin + Position(-1, -1, -1),
+					origin + Position(0, -1, -1),
+					origin + Position(1, -1, -1),
 
-					origin + Position( 1, 0, 0 ),
-					origin + Position( 1, 1, 0 ),
-					origin + Position( 0, 1, 0 ),
-					origin + Position( -1, 1, 0 ),
-					origin + Position( -1, 0, 0 ),
-					origin + Position( -1, -1, 0 ),
-					origin + Position( 0, -1, 0 ),
-					origin + Position( 1, -1, 0 ),
+					origin + Position(1, 0, 0),
+					origin + Position(1, 1, 0),
+					origin + Position(0, 1, 0),
+					origin + Position(-1, 1, 0),
+					origin + Position(-1, 0, 0),
+					origin + Position(-1, -1, 0),
+					origin + Position(0, -1, 0),
+					origin + Position(1, -1, 0),
 
-					origin + Position( 1, 0, 1 ),
-					origin + Position( 1, 1, 1 ),
-					origin + Position( 0, 1, 1 ),
-					origin + Position( -1, 1, 1 ),
-					origin + Position( -1, 0, 1 ),
-					origin + Position( -1, -1, 1 ),
-					origin + Position( 0, -1, 1 ),
-					origin + Position( 1, -1, 1 )
+					origin + Position(1, 0, 1),
+					origin + Position(1, 1, 1),
+					origin + Position(0, 1, 1),
+					origin + Position(-1, 1, 1),
+					origin + Position(-1, 0, 1),
+					origin + Position(-1, -1, 1),
+					origin + Position(0, -1, 1),
+					origin + Position(1, -1, 1)
 			};
 		}
 		else
 		{
 			return std::vector<Position>
 			{
-				origin + Position( 1, 0, 0 ),
-					origin + Position( 1, 1, 0 ),
-					origin + Position( 0, 1, 0 ),
-					origin + Position( -1, 1, 0 ),
-					origin + Position( -1, 0, 0 ),
-					origin + Position( -1, -1, 0 ),
-					origin + Position( 0, -1, 0 ),
-					origin + Position( 1, -1, 0 )
+				origin + Position(1, 0, 0),
+					origin + Position(1, 1, 0),
+					origin + Position(0, 1, 0),
+					origin + Position(-1, 1, 0),
+					origin + Position(-1, 0, 0),
+					origin + Position(-1, -1, 0),
+					origin + Position(0, -1, 0),
+					origin + Position(1, -1, 0)
 			};
 		}
 	}

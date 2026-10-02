@@ -7,18 +7,18 @@
 #include "config.h"
 #include "output.h"
 
-inline bool initialize( int argc, const char* argv[] )
+inline bool initialize(int argc, const char* argv[])
 {
-	if ( !validate_filesystem() )
+	if (!validate_filesystem())
 		return false;
 
-	if ( !config_init() )
+	if (!config_init())
 		return false;
 
-	SDL_LogSetAllPriority( SDL_LOG_PRIORITY_WARN );
-	atexit( TCOD_quit );
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
+	atexit(TCOD_quit);
 
-	if ( !output::setup_context( argc, argv ) )
+	if (!output::setup_context(argc, argv))
 		return false;
 
 	return true;
